@@ -307,17 +307,25 @@ public class MainActivity extends ActionBarActivity {
                 }
                 break;
             case REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR:
-                String ShortLivedAuthorizationToken = null;
-                try {
-                    ShortLivedAuthorizationToken = GoogleAuthUtil.getToken(this, accountEmail, getAuthTokenTask.mScope);
-                } catch (Exception e) {};
-                if (regid != null && ShortLivedAuthorizationToken != null) {
-                    Log.v(TAG, "Short lived authorization token received: " + ShortLivedAuthorizationToken);
-
-                    firstLoginTask aLoginTask = new firstLoginTask(getApplicationContext(), usersApiInst, accountEmail, "00000000", regid);
-                    aLoginTask.addTokenToMessage(ShortLivedAuthorizationToken);
-                    aLoginTask.execute();
-                }
+                // Android, you ugly, ugly piece of turd.
+                (new AsyncTask<Void, Void, String>() {
+                    @Override
+                    protected String doInBackground(Void... params) {
+                        String ShortLivedAuthorizationToken = null;
+                        try {
+                            ShortLivedAuthorizationToken = GoogleAuthUtil.getToken(MainActivity.this, accountEmail, getAuthTokenTask.mScope);
+                        } catch (Exception e) {};
+                        return ShortLivedAuthorizationToken;
+                    }
+                    @Override
+                    protected void onPostExecute(String ShortLivedAuthorizationToken) {
+                        if (regid != null && ShortLivedAuthorizationToken != null) {
+                            firstLoginTask aLoginTask = new firstLoginTask(getApplicationContext(), usersApiInst, accountEmail, "00000000", regid);
+                            aLoginTask.addTokenToMessage(ShortLivedAuthorizationToken);
+                            aLoginTask.execute();
+                        }
+                    }
+                }).execute();
                 break;
         }
     }

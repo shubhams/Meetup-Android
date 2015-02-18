@@ -20,14 +20,15 @@ import java.io.IOException;
  * Created by aditya on 16/02/15.
  */
 
-public class getAuthTokenTask extends AsyncTask<Void,String,String> {
+public class getAuthTokenTask extends AsyncTask<Void,Void,String> {
+
     public static final String WEB_CLIENT_ID = "812458715891-p8e6e4oqph65matkdr1v06r02vtri1du.apps.googleusercontent.com";
     public static final String EMAIL_SCOPE = "https://www.googleapis.com/auth/userinfo.email";
     public static final String CONTACTS_SCOPE = "https://www.googleapis.com/auth/contacts.readonly";
+    public static final String mScope = "oauth2:server:client_id:" + WEB_CLIENT_ID + ":api_scope:" + EMAIL_SCOPE + " " + CONTACTS_SCOPE;
 
     private static final int REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR = 1001;
     Activity mActivity;
-    public static String mScope = "oauth2:server:client_id:" + WEB_CLIENT_ID + ":api_scope:" + EMAIL_SCOPE + " " + CONTACTS_SCOPE;
     String mEmail;
     firstLoginTask loginTask;
 
@@ -49,11 +50,10 @@ public class getAuthTokenTask extends AsyncTask<Void,String,String> {
      * Executes the asynchronous job. This runs when you call execute()
      * on the AsyncTask instance.
      */
-    @Override
     protected String doInBackground(Void... params) {
         String shortLivedAuthorizationCodeForServer = null;
         try {
-// https://developers.google.com/accounts/docs/CrossClientAuth#offlineAccess
+            // https://developers.google.com/accounts/docs/CrossClientAuth#offlineAccess
             shortLivedAuthorizationCodeForServer = fetchToken();
         } catch (IOException e) {
             e.printStackTrace();
@@ -81,14 +81,19 @@ public class getAuthTokenTask extends AsyncTask<Void,String,String> {
         return null;
     }
 
+
+    /**
+     * Executes the asynchronous job. This runs when you call execute()
+     * on the AsyncTask instance.
+     */
     @Override
     protected void onPostExecute(String shortLivedAuthorizationCodeForServer){
         if (shortLivedAuthorizationCodeForServer != null) {
-            Log.v(TAG, "Short lived authorization token received: " + shortLivedAuthorizationCodeForServer);
-// Insert the good stuff here.
-// Use the token to access the user's Google data.
             loginTask.addTokenToMessage(shortLivedAuthorizationCodeForServer);
             loginTask.execute();
+            // Insert the good stuff here.
+            // Use the token to access the user's Google data.
+            Log.v(TAG, "Short lived authorization token received: " + shortLivedAuthorizationCodeForServer);
         }
     }
 
