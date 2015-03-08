@@ -24,7 +24,7 @@ public class contactsTask extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... params) {
         try {
-            usersApi.printContacts().execute();
+            usersApi.getContacts().execute();
         } catch (IOException e) {
             Log.d("Meetup", e.getMessage(), e);
             e.printStackTrace();

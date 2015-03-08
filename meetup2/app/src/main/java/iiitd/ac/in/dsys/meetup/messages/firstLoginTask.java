@@ -1,45 +1,42 @@
 package iiitd.ac.in.dsys.meetup.messages;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.appspot.intense_terra_821.users_api.UsersApi;
-import com.appspot.intense_terra_821.users_api.model.ApiAuthenticationFirstLoginMessage;
-import com.appspot.intense_terra_821.users_api.model.ApiCommonApiReply;
-import com.google.android.gms.auth.GoogleAuthException;
-import com.google.android.gms.auth.GoogleAuthUtil;
+import com.appspot.intense_terra_821.users_api.model.ApiCustomMessagesApiReply;
+import com.appspot.intense_terra_821.users_api.model.ApiCustomMessagesFirstLoginMessage;
 
 import java.io.IOException;
 
 /**
  * Created by aditya on 14/02/15.
  */
-public class firstLoginTask extends AsyncTask<Void, Void, ApiCommonApiReply> {
+public class firstLoginTask extends AsyncTask<Void, Void, ApiCustomMessagesApiReply> {
     Context context;
     UsersApi usersApi;
-    ApiAuthenticationFirstLoginMessage firstLoginMessage;
+    ApiCustomMessagesFirstLoginMessage firstLoginMessage;
     String TAG="firstLoginTask";
 
     public firstLoginTask(Context context, UsersApi usersApi, String fullName, String phNumber, String regID) {
         this(context, usersApi,
-                new ApiAuthenticationFirstLoginMessage().setRegID(regID).setName(fullName).setPhNumber(phNumber));
+                new ApiCustomMessagesFirstLoginMessage().setRegID(regID).setName(fullName).setPhNumber(phNumber));
     }
 
-    public firstLoginTask(Context context, UsersApi usersApi, ApiAuthenticationFirstLoginMessage firstLoginMessage) {
+    public firstLoginTask(Context context, UsersApi usersApi, ApiCustomMessagesFirstLoginMessage firstLoginMessage) {
         this.context = context;
         this.usersApi = usersApi;
         this.firstLoginMessage = firstLoginMessage;
     }
 
     @Override
-    protected ApiCommonApiReply doInBackground(Void... params) {
-        ApiCommonApiReply reply = null;
+    protected ApiCustomMessagesApiReply doInBackground(Void... params) {
+        ApiCustomMessagesApiReply reply = null;
         try {
             UsersApi.FirstLogin aRequest = usersApi.firstLogin(firstLoginMessage);
-            aRequest.execute();
+            reply = aRequest.execute();
         } catch (IOException e) {
             Log.d(TAG, e.getMessage(), e);
             e.printStackTrace();
@@ -48,7 +45,7 @@ public class firstLoginTask extends AsyncTask<Void, Void, ApiCommonApiReply> {
     }
 
     @Override
-    protected void onPostExecute(ApiCommonApiReply reply) {
+    protected void onPostExecute(ApiCustomMessagesApiReply reply) {
         if (reply != null) {
             Toast.makeText(context, reply.getStrValue(), Toast.LENGTH_LONG).show();
             Log.v(TAG,reply.getStrValue());

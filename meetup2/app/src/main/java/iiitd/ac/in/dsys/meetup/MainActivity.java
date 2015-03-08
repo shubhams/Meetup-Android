@@ -87,7 +87,7 @@ public class MainActivity extends ActionBarActivity {
         // add UI Callbacks
         setUICallbacks();
         // build services. Set the first param to true to test locally. Second param is local IP of server.
-        buildApiServices(false, "192.168.1.6");
+        buildApiServices(false, "192.168.0.100");
 
         // Check device for Play Services APK.
         if (checkPlayServices()) {

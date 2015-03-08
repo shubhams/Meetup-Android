@@ -6,14 +6,14 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.appspot.intense_terra_821.users_api.UsersApi;
-import com.appspot.intense_terra_821.users_api.model.ApiCommonApiReply;
+import com.appspot.intense_terra_821.users_api.model.ApiCustomMessagesApiReply;
 
 import java.io.IOException;
 
 /**
  * Created by aditya on 12/02/15.
  */
-public class pingHelloTask extends AsyncTask<Void, Void, ApiCommonApiReply> {
+public class pingHelloTask extends AsyncTask<Void, Void, ApiCustomMessagesApiReply> {
     Context context;
     UsersApi usersApi;
 
@@ -24,8 +24,8 @@ public class pingHelloTask extends AsyncTask<Void, Void, ApiCommonApiReply> {
     }
 
     @Override
-    protected ApiCommonApiReply doInBackground(Void... params) {
-        ApiCommonApiReply reply = null;
+    protected ApiCustomMessagesApiReply doInBackground(Void... params) {
+        ApiCustomMessagesApiReply reply = null;
         try {
             // UsersApi service = builder.build();
             reply = usersApi.pingHello().execute();
@@ -37,7 +37,7 @@ public class pingHelloTask extends AsyncTask<Void, Void, ApiCommonApiReply> {
     }
 
     @Override
-    protected void onPostExecute(ApiCommonApiReply reply) {
+    protected void onPostExecute(ApiCustomMessagesApiReply reply) {
         if (reply != null)
             Toast.makeText(context, reply.getStrValue(), Toast.LENGTH_LONG).show();
     }
