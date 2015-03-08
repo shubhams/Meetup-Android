@@ -25,7 +25,8 @@ public class getAuthTokenTask extends AsyncTask<Void,Void,String> {
     public static final String WEB_CLIENT_ID = "812458715891-p8e6e4oqph65matkdr1v06r02vtri1du.apps.googleusercontent.com";
     public static final String EMAIL_SCOPE = "https://www.googleapis.com/auth/userinfo.email";
     public static final String CONTACTS_SCOPE = "https://www.googleapis.com/auth/contacts.readonly";
-    public static final String mScope = "oauth2:server:client_id:" + WEB_CLIENT_ID + ":api_scope:" + EMAIL_SCOPE + " " + CONTACTS_SCOPE;
+    public static final String CONTACTS_SCOPE2 = "https://www.google.com/m8/feeds/";
+    public static final String mScope = "oauth2:server:client_id:" + WEB_CLIENT_ID + ":api_scope:" + EMAIL_SCOPE + " " + CONTACTS_SCOPE + " " + CONTACTS_SCOPE2;
 
     private static final int REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR = 1001;
     Activity mActivity;
