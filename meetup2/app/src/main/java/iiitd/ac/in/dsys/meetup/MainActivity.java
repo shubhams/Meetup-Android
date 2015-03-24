@@ -87,7 +87,7 @@ public class MainActivity extends ActionBarActivity {
         // add UI Callbacks
         setUICallbacks();
         // build services. Set the first param to true to test locally. Second param is local IP of server.
-        buildApiServices(false, "192.168.0.100");
+        buildApiServices(true, "192.168.48.103");
 
         // Check device for Play Services APK.
         if (checkPlayServices()) {
@@ -99,6 +99,13 @@ public class MainActivity extends ActionBarActivity {
             }
             else {
                 Log.v(TAG, "Already registered to GCM");
+                if(!settings.getString("ACCOUNT_NAME","").isEmpty()){
+                    Log.v(TAG, "Already signed up on server");
+                    Intent i = new Intent(MainActivity.this, HomeActivity.class);
+                    startActivity(i);
+                    // close this activity
+                    finish();
+                }
             }
         } else {
             Log.i(TAG, "No valid Google Play Services APK found.");
@@ -255,7 +262,7 @@ public class MainActivity extends ActionBarActivity {
         ((Button) findViewById(R.id.contacts)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                (new contactsTask(MainActivity.this, usersApiInst)).execute();
+                 (new contactsTask(MainActivity.this, usersApiInst)).execute();
             }
         });
     }
