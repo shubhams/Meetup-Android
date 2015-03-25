@@ -20,6 +20,7 @@ import com.appspot.intense_terra_821.data_api.DataApiRequestInitializer;
 import com.appspot.intense_terra_821.users_api.UsersApi;
 import com.appspot.intense_terra_821.users_api.UsersApiRequest;
 import com.appspot.intense_terra_821.users_api.UsersApiRequestInitializer;
+import com.appspot.intense_terra_821.users_api.model.ApiCustomMessagesFriendsProfilesMessage;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -36,13 +37,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import iiitd.ac.in.dsys.meetup.CommonUtils;
 import iiitd.ac.in.dsys.meetup.R;
+import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnContactsTaskCompleted;
 import iiitd.ac.in.dsys.meetup.messages.contactsTask;
 import iiitd.ac.in.dsys.meetup.messages.firstLoginTask;
 import iiitd.ac.in.dsys.meetup.messages.getAuthTokenTask;
 import iiitd.ac.in.dsys.meetup.messages.pingHelloTask;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements OnContactsTaskCompleted{
     Context context;
     private SharedPreferences settings;
     String TAG="MainActivity";
@@ -268,7 +270,7 @@ public class MainActivity extends ActionBarActivity {
         ((Button) findViewById(R.id.contacts)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                 (new contactsTask(MainActivity.this, usersApiInst)).execute();
+                 (new contactsTask(MainActivity.this,usersApiInst,MainActivity.this)).execute();
             }
         });
     }
@@ -395,4 +397,8 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
+    @Override
+    public void onTaskCompleted(ApiCustomMessagesFriendsProfilesMessage contactsList) {
+
+    }
 }

@@ -117,12 +117,14 @@ public class MeetupListFragment extends ListFragment implements OnGetMeetupsTask
                 Log.v(TAG, "No meetups");
         }
 
-        if(adapter!=null && !adapter.isEmpty())
+        if(adapter!=null && !adapter.isEmpty()) {
+//            Log.v(TAG,"adapter no null not empty");
             setListAdapter(adapter);
+        }
         else {
             setListShown(true);
-            Toast.makeText(getActivity(),"You aren't involved in any meetups",Toast.LENGTH_LONG).show();
-            Toast.makeText(getActivity(),"Start your own by clicking the plus",Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(),"You aren't involved in any meetups",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(),"Start your own by clicking the plus",Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -1,5 +1,6 @@
 package iiitd.ac.in.dsys.meetup.Activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -101,6 +102,11 @@ public class HomeActivity extends ActionBarActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            return true;
+        }
+        if (id == R.id.action_new_meetup){
+            Intent i = new Intent(HomeActivity.this, StartMeetupActivity.class);
+            startActivity(i);
             return true;
         }
 

@@ -5,6 +5,4 @@
     <item android:id="@+id/action_new_meetup" android:title="@string/action_new_meetup"
         android:icon="@drawable/ic_action_new_meetup"
         app:showAsAction="withText|ifRoom" />
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"
-        android:orderInCategory="100" app:showAsAction="never" />
 </menu>

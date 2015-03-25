@@ -16,6 +16,9 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_new_meetup">New Meetup</string>
-    <string name="title_activity_start_meetup">StartMeetupActivity</string>
+    <string name="action_done">Done</string>
+    <string name="action_next">Next</string>
+    <string name="action_previous">Previous</string>
+    <string name="title_activity_start_meetup">New Meetup</string>
 
 </resources>
