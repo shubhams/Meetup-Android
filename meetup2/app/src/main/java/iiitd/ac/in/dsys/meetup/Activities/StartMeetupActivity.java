@@ -14,22 +14,28 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
+import com.appspot.intense_terra_821.data_api.DataApi;
+import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesUpMeetupCreateMessage;
 import com.appspot.intense_terra_821.users_api.UsersApi;
 import com.appspot.intense_terra_821.users_api.model.ApiCustomMessagesFriendsProfilesMessage;
 import com.appspot.intense_terra_821.users_api.model.ApiCustomMessagesProfileMessageFriendMessage;
+import com.google.api.client.util.DateTime;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.TimeZone;
 
 import iiitd.ac.in.dsys.meetup.CommonUtils;
 import iiitd.ac.in.dsys.meetup.CustomUI.ContactsListAdapter;
 import iiitd.ac.in.dsys.meetup.R;
 import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnContactsTaskCompleted;
+import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnMakeMeetupTaskCompleted;
 import iiitd.ac.in.dsys.meetup.messages.contactsTask;
+import iiitd.ac.in.dsys.meetup.messages.makeMeetupTask;
 
 public class StartMeetupActivity extends ActionBarActivity
-        implements OnContactsTaskCompleted,android.widget.CompoundButton.OnCheckedChangeListener{
+        implements OnContactsTaskCompleted,android.widget.CompoundButton.OnCheckedChangeListener
+                    ,OnMakeMeetupTaskCompleted{
 
     private static final String TAG ="StartMeetupActivity" ;
     ContactsListAdapter contactsListAdapter;
@@ -39,11 +45,13 @@ public class StartMeetupActivity extends ActionBarActivity
     TimePicker tp;
     EditText ed;
     UsersApi usersApiInst;
+    DataApi dataApiInst;
     ProgressDialog progressDialog;
     ViewFlipper vf;
     MenuItem prev,next,done;
-    String timeToArrive;
-    String meetupName;
+    DateTime timeToArrive;
+    String meetupName="";
+    double lat=28.546207,lon=77.272208;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +65,7 @@ public class StartMeetupActivity extends ActionBarActivity
         contacts=new ArrayList<String>();
         invitees=new ArrayList<String>();
         progressDialog=new ProgressDialog(this);
+        dataApiInst= CommonUtils.getDataApiInst();
     }
 
     @Override
@@ -128,20 +137,56 @@ public class StartMeetupActivity extends ActionBarActivity
 
     private void storeInputs() {
         Calendar c=Calendar.getInstance();
+        c.setTimeZone(TimeZone.getTimeZone("UTC"));
+
         int year=dp.getYear();
         int month=dp.getMonth();
         int day=dp.getDayOfMonth();
         int hourOfDay=tp.getCurrentHour();
         int minute=tp.getCurrentMinute();
+
         c.set(year,month,day,hourOfDay,minute);
+//        c.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         meetupName=ed.getText().toString();
 
-        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
+//        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
+//        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-        Log.v(TAG,meetupName+" on "+sdf.format(c.getTime()).toString()+"("+c.getTimeInMillis()+")");
+        Log.v(TAG,meetupName+" on "+c.getTimeZone());
 
-        timeToArrive=sdf.format(c.getTime()).toString();
+        timeToArrive=new DateTime(c.getTime());
+
+        Log.v(TAG,"DateTime "+timeToArrive);
+
+//        try {
+//            Log.v(TAG,meetupName+" on "+timeToArrive+" "+sdf.parse(sdf.format(c.getTime())));
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+
+        createUpMessage();
+    }
+
+    private void createUpMessage() {
+        ApiCustomMessagesUpMeetupCreateMessage createMessage=new ApiCustomMessagesUpMeetupCreateMessage();
+        if(meetupName.isEmpty()){
+            Toast.makeText(this,"Please enter a meetupName",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        createMessage.setName(meetupName);
+        if(invitees==null || invitees.isEmpty()){
+            Toast.makeText(this,"No contacts have been invited",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        createMessage.setInvited(invitees);
+
+        createMessage.setTimeToArrive(timeToArrive);
+        createMessage.setLat(lat);
+        createMessage.setLon(lon);
+
+        progressDialog=ProgressDialog.show(this, "Wait", "Creating meetup...");
+        (new makeMeetupTask(this, dataApiInst,this,createMessage)).execute();
     }
 
     @Override
@@ -178,5 +223,12 @@ public class StartMeetupActivity extends ActionBarActivity
             else
                 invitees.remove(contacts.get(pos));
         }
+    }
+
+    @Override
+    public void onTaskCompleted(String message) {
+        progressDialog.dismiss();
+        progressDialog.cancel();
+        Log.v(TAG,"Meetup creation: "+message);
     }
 }
