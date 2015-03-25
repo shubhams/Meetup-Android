@@ -1,4 +1,4 @@
-package iiitd.ac.in.dsys.meetup;
+package iiitd.ac.in.dsys.meetup.Activities;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -6,14 +6,17 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import iiitd.ac.in.dsys.meetup.DrawerFragments.MeetupListFragment;
+import iiitd.ac.in.dsys.meetup.DrawerSectionFragments.MeetupListFragment;
+import iiitd.ac.in.dsys.meetup.Fragments.NavigationDrawerFragment;
+import iiitd.ac.in.dsys.meetup.R;
 
 
 public class HomeActivity extends ActionBarActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks,MeetupListFragment.OnFragmentInteractionListener {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -24,6 +27,7 @@ public class HomeActivity extends ActionBarActivity
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
+    private static final String TAG="HomeActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,14 +47,16 @@ public class HomeActivity extends ActionBarActivity
     @Override
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
+        Log.v(TAG,"itemSelected "+position);
         FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment fragment=null;
-        switch (position) {
+        switch (position+1) {
             case 1:
                 fragment=new MeetupListFragment();
                 break;
         }
         if (fragment != null) {
+            Log.v(TAG,"not Null");
             fragmentManager.beginTransaction()
                     .replace(R.id.container, fragment)
                             .commit();
@@ -101,4 +107,8 @@ public class HomeActivity extends ActionBarActivity
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onFragmentInteraction(String id) {
+
+    }
 }

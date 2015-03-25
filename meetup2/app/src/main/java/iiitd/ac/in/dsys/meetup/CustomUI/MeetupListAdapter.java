@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import iiitd.ac.in.dsys.meetup.Objects.MeetupObject;
+import iiitd.ac.in.dsys.meetup.ObjectClasses.MeetupObject;
 import iiitd.ac.in.dsys.meetup.R;
 
 /**
@@ -21,7 +21,7 @@ public class MeetupListAdapter extends ArrayAdapter {
     private final ArrayList<MeetupObject> entryObjectList;
 
     public MeetupListAdapter(Context context, ArrayList<MeetupObject> objectList) {
-        super(context, R.layout.meetup_list_item, objectList);
+        super(context, R.layout.list_item_meetup, objectList);
         this.context = context;
         this.entryObjectList = objectList;
     }
@@ -30,11 +30,11 @@ public class MeetupListAdapter extends ArrayAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View rowView = inflater.inflate(R.layout.meetup_list_item, parent, false);
+        View rowView = inflater.inflate(R.layout.list_item_meetup, parent, false);
         TextView nameTextView = (TextView)rowView.findViewById(R.id.nameTV);
         nameTextView.setText(entryObjectList.get(position).getName());
-        TextView timeTextView = (TextView)rowView.findViewById(R.id.timeTV);
-        timeTextView.setText(""+entryObjectList.get(position).getTimeOfArrival());
+//        TextView timeTextView = (TextView)rowView.findViewById(R.id.timeTV);
+//        timeTextView.setText(""+entryObjectList.get(position).getTimeOfArrival());
         TextView ownerTextView = (TextView) rowView.findViewById(R.id.ownerTV);
         ownerTextView.setText(entryObjectList.get(position).getOwner());
         Switch sw=(Switch) rowView.findViewById(R.id.switch1);

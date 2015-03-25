@@ -1,4 +1,4 @@
-package iiitd.ac.in.dsys.meetup.Objects;
+package iiitd.ac.in.dsys.meetup.ObjectClasses;
 
 /**
  * Created by vedantdasswain on 24/03/15.

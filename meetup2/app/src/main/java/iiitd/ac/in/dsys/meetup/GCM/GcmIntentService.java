@@ -12,7 +12,7 @@ import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-import iiitd.ac.in.dsys.meetup.MainActivity;
+import iiitd.ac.in.dsys.meetup.Activities.MainActivity;
 import iiitd.ac.in.dsys.meetup.R;
 
 

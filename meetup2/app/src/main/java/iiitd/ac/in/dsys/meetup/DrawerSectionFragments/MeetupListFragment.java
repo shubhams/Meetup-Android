@@ -1,12 +1,21 @@
-package iiitd.ac.in.dsys.meetup.DrawerFragments;
+package iiitd.ac.in.dsys.meetup.DrawerSectionFragments;
 
 import android.app.Activity;
-import android.support.v4.app.ListFragment;
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.appspot.intense_terra_821.data_api.DataApi;
+import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesMeetupListMessage;
+import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesMeetupMessage;
+
+import iiitd.ac.in.dsys.meetup.CommonUtils;
 import iiitd.ac.in.dsys.meetup.CustomUI.MeetupListAdapter;
+import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnGetMeetupsTaskCompleted;
+import iiitd.ac.in.dsys.meetup.messages.getMeetupsTask;
 
 /**
  * A fragment representing a list of Items.
@@ -15,7 +24,7 @@ import iiitd.ac.in.dsys.meetup.CustomUI.MeetupListAdapter;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class MeetupListFragment extends ListFragment {
+public class MeetupListFragment extends ListFragment implements OnGetMeetupsTaskCompleted {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -28,6 +37,7 @@ public class MeetupListFragment extends ListFragment {
 
     private OnFragmentInteractionListener mListener;
     private MeetupListAdapter adapter;
+    private static final String TAG="MeetupListFragment";
 
     // TODO: Rename and change types of parameters
     public static MeetupListFragment newInstance(String param1, String param2) {
@@ -38,6 +48,8 @@ public class MeetupListFragment extends ListFragment {
         fragment.setArguments(args);
         return fragment;
     }
+
+    DataApi dataApiInst;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -54,15 +66,19 @@ public class MeetupListFragment extends ListFragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+    }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+//        Log.v(TAG,"onResume");
         getMeetups();
-        if(adapter!=null && !adapter.isEmpty())
-            setListAdapter(adapter);
-        else
-            setListShown(true);
     }
 
     private void getMeetups() {
+        Log.v(TAG,"Start fetching meetups...");
+        dataApiInst= CommonUtils.getDataApiInst();
+        (new getMeetupsTask(getActivity(), dataApiInst,this)).execute();
     }
 
 
@@ -87,6 +103,27 @@ public class MeetupListFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
+    }
+
+    @Override
+    public void onTaskCompleted(ApiCustomMessagesMeetupListMessage meetupsList) {
+        if(meetupsList!=null) {
+            Log.v(TAG, "Success message: " + meetupsList.getSuccess().getStrValue());
+            if (!meetupsList.isEmpty() && meetupsList.getMeetups() != null)
+                for (ApiCustomMessagesMeetupMessage meetup : meetupsList.getMeetups())
+                    Log.v(TAG, "Meetup: " + meetup.getName() +" by "+ meetup.getOwner()
+                            +"Is active: "+meetup.getActive());
+            else
+                Log.v(TAG, "No meetups");
+        }
+
+        if(adapter!=null && !adapter.isEmpty())
+            setListAdapter(adapter);
+        else {
+            setListShown(true);
+            Toast.makeText(getActivity(),"You aren't involved in any meetups",Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(),"Start your own by clicking the plus",Toast.LENGTH_LONG).show();
+        }
     }
 
     /**

@@ -1,4 +1,4 @@
-package iiitd.ac.in.dsys.meetup;
+package iiitd.ac.in.dsys.meetup.Activities;
 
 import android.accounts.AccountManager;
 import android.content.Context;
@@ -14,6 +14,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.appspot.intense_terra_821.data_api.DataApi;
+import com.appspot.intense_terra_821.data_api.DataApiRequest;
+import com.appspot.intense_terra_821.data_api.DataApiRequestInitializer;
 import com.appspot.intense_terra_821.users_api.UsersApi;
 import com.appspot.intense_terra_821.users_api.UsersApiRequest;
 import com.appspot.intense_terra_821.users_api.UsersApiRequestInitializer;
@@ -31,6 +34,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import iiitd.ac.in.dsys.meetup.CommonUtils;
+import iiitd.ac.in.dsys.meetup.R;
 import iiitd.ac.in.dsys.meetup.messages.contactsTask;
 import iiitd.ac.in.dsys.meetup.messages.firstLoginTask;
 import iiitd.ac.in.dsys.meetup.messages.getAuthTokenTask;
@@ -62,6 +67,7 @@ public class MainActivity extends ActionBarActivity {
     //Cloud Endpoints
     // Services
     UsersApi usersApiInst;
+    DataApi dataApiInst;
 
     // Credentials, client ID, Authorization
     GoogleAccountCredential credential;
@@ -360,6 +366,32 @@ public class MainActivity extends ActionBarActivity {
         } else {
             usersApiInst = userApiBuilder.build();
         }
+
+        CommonUtils.setUsersApiInst(usersApiInst);
+
+        DataApi.Builder dataApiBuilder = new DataApi.Builder(
+                AndroidHttp.newCompatibleTransport(),
+                new GsonFactory(),
+                // null works
+                credential);
+        if(local){
+            dataApiBuilder.setGoogleClientRequestInitializer(new DataApiRequestInitializer(){
+                @Override
+                // Because the dev-server cannot handle GZip.
+                // http://stackoverflow.com/questions/15393363/how-to-disable-gzipcontent-in-cloud-endpoints-builder-in-android
+                // https://code.google.com/p/googleappengine/issues/detail?id=9140
+                protected void initializeDataApiRequest(DataApiRequest<?> request) {
+                    request.setDisableGZipContent(true);
+                    // Add email because endpoints sucks.
+                    request.setRequestHeaders(new HttpHeaders().set("ENDPOINTS_AUTH_EMAIL", settings.getString("ACCOUNT_NAME", null)));
+                }
+            });
+            dataApiInst = dataApiBuilder.setRootUrl("http://" + IP + ":8080/_ah/api").build();
+        } else {
+            dataApiInst = dataApiBuilder.build();
+        }
+
+        CommonUtils.setDataApiInst(dataApiInst);
 
     }
 
