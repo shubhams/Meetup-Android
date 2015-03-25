@@ -7,7 +7,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
@@ -15,7 +18,9 @@ import com.appspot.intense_terra_821.users_api.UsersApi;
 import com.appspot.intense_terra_821.users_api.model.ApiCustomMessagesFriendsProfilesMessage;
 import com.appspot.intense_terra_821.users_api.model.ApiCustomMessagesProfileMessageFriendMessage;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import iiitd.ac.in.dsys.meetup.CommonUtils;
 import iiitd.ac.in.dsys.meetup.CustomUI.ContactsListAdapter;
@@ -30,17 +35,25 @@ public class StartMeetupActivity extends ActionBarActivity
     ContactsListAdapter contactsListAdapter;
     ArrayList<String> contacts,invitees;
     ListView lv;
+    DatePicker dp;
+    TimePicker tp;
+    EditText ed;
     UsersApi usersApiInst;
     ProgressDialog progressDialog;
     ViewFlipper vf;
     MenuItem prev,next,done;
+    String timeToArrive;
+    String meetupName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_meetup);
         lv=(ListView)findViewById(R.id.contactsListView);
+        dp=(DatePicker)findViewById(R.id.datePicker);
+        tp=(TimePicker)findViewById(R.id.timePicker);
         vf=(ViewFlipper) findViewById(R.id.viewFlipper);
+        ed=(EditText) findViewById(R.id.meetupEditText);
         contacts=new ArrayList<String>();
         invitees=new ArrayList<String>();
         progressDialog=new ProgressDialog(this);
@@ -98,8 +111,7 @@ public class StartMeetupActivity extends ActionBarActivity
             case R.id.action_next:
                 vf.showNext();
                 if(vf.getDisplayedChild()==2) {
-                    if(!contacts.isEmpty())
-                        getContacts();
+                    getContacts();
                     next.setVisible(false);
                     done.setVisible(true);
                 }
@@ -107,10 +119,29 @@ public class StartMeetupActivity extends ActionBarActivity
                 return true;
 
             case R.id.action_done:
+                storeInputs();
                 return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void storeInputs() {
+        Calendar c=Calendar.getInstance();
+        int year=dp.getYear();
+        int month=dp.getMonth();
+        int day=dp.getDayOfMonth();
+        int hourOfDay=tp.getCurrentHour();
+        int minute=tp.getCurrentMinute();
+        c.set(year,month,day,hourOfDay,minute);
+
+        meetupName=ed.getText().toString();
+
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
+
+        Log.v(TAG,meetupName+" on "+sdf.format(c.getTime()).toString()+"("+c.getTimeInMillis()+")");
+
+        timeToArrive=sdf.format(c.getTime()).toString();
     }
 
     @Override
@@ -121,7 +152,8 @@ public class StartMeetupActivity extends ActionBarActivity
             Log.v(TAG,"Success message"+contactsList.getSuccess().getStrValue());
             if (!contactsList.isEmpty() && contactsList.getProfiles() != null)
                 for (ApiCustomMessagesProfileMessageFriendMessage name : contactsList.getProfiles()) {
-                    contacts.add(name.getEmail());
+                    if(contacts.indexOf(name.getEmail())<0)
+                        contacts.add(name.getEmail());
                     Log.v(TAG, "Email name: " + name.getEmail());
                 }
             else {
