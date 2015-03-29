@@ -6,34 +6,34 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.appspot.intense_terra_821.users_api.UsersApi;
-import com.appspot.intense_terra_821.users_api.model.ApiCustomMessagesApiReply;
-import com.appspot.intense_terra_821.users_api.model.ApiCustomMessagesFirstLoginMessage;
+import com.appspot.intense_terra_821.users_api.model.ApiCustomMessagesSuccessMessage;
+import com.appspot.intense_terra_821.users_api.model.ApiCustomMessagesUpFirstLoginMessage;
 
 import java.io.IOException;
 
 /**
  * Created by aditya on 14/02/15.
  */
-public class firstLoginTask extends AsyncTask<Void, Void, ApiCustomMessagesApiReply> {
+public class firstLoginTask extends AsyncTask<Void, Void, ApiCustomMessagesSuccessMessage> {
     Context context;
     UsersApi usersApi;
-    ApiCustomMessagesFirstLoginMessage firstLoginMessage;
+    ApiCustomMessagesUpFirstLoginMessage firstLoginMessage;
     String TAG="firstLoginTask";
 
     public firstLoginTask(Context context, UsersApi usersApi, String fullName, String phNumber, String regID) {
         this(context, usersApi,
-                new ApiCustomMessagesFirstLoginMessage().setRegID(regID).setName(fullName).setPhNumber(phNumber));
+                new ApiCustomMessagesUpFirstLoginMessage().setRegID(regID).setName(fullName).setPhNumber(phNumber));
     }
 
-    public firstLoginTask(Context context, UsersApi usersApi, ApiCustomMessagesFirstLoginMessage firstLoginMessage) {
+    public firstLoginTask(Context context, UsersApi usersApi, ApiCustomMessagesUpFirstLoginMessage firstLoginMessage) {
         this.context = context;
         this.usersApi = usersApi;
         this.firstLoginMessage = firstLoginMessage;
     }
 
     @Override
-    protected ApiCustomMessagesApiReply doInBackground(Void... params) {
-        ApiCustomMessagesApiReply reply = null;
+    protected ApiCustomMessagesSuccessMessage doInBackground(Void... params) {
+        ApiCustomMessagesSuccessMessage reply = null;
         try {
             UsersApi.FirstLogin aRequest = usersApi.firstLogin(firstLoginMessage);
             reply = aRequest.execute();
@@ -45,7 +45,7 @@ public class firstLoginTask extends AsyncTask<Void, Void, ApiCustomMessagesApiRe
     }
 
     @Override
-    protected void onPostExecute(ApiCustomMessagesApiReply reply) {
+    protected void onPostExecute(ApiCustomMessagesSuccessMessage reply) {
         if (reply != null) {
             Toast.makeText(context, reply.getStrValue(), Toast.LENGTH_LONG).show();
             Log.v(TAG,reply.getStrValue());

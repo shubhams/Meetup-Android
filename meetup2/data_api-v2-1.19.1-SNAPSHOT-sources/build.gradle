@@ -1,0 +1,2 @@
+configurations.create("default")
+artifacts.add("default", file('data_api-v2-1.19.1-SNAPSHOT-sources.jar'))

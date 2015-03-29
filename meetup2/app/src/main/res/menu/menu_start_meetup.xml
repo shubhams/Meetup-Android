@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="iiitd.ac.in.dsys.meetup.Activities.StartMeetupActivity">
+    <item android:id="@+id/action_previous" android:title="@string/action_previous"
+        android:icon="@drawable/ic_action_previous"
+        app:showAsAction="withText|ifRoom" />
+    <item android:id="@+id/action_next" android:title="@string/action_next"
+        android:icon="@drawable/ic_action_next"
+        app:showAsAction="withText|ifRoom" />
+    <item android:id="@+id/action_done" android:title="@string/action_done"
+        android:icon="@drawable/ic_action_done"
+        app:showAsAction="withText|ifRoom" />
+</menu>

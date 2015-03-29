@@ -86,7 +86,7 @@ MERGED from com.android.support:support-v4:21.0.3:16:5
 		ADDED from AndroidManifest.xml:31:13
 	android:theme
 		ADDED from AndroidManifest.xml:33:13
-activity#iiitd.ac.in.dsys.meetup.MainActivity
+activity#iiitd.ac.in.dsys.meetup.Activities.MainActivity
 ADDED from AndroidManifest.xml:35:9
 	android:label
 		ADDED from AndroidManifest.xml:37:17
