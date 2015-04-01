@@ -14,10 +14,9 @@ import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnGetMeetupsTaskCompleted;
 /**
  * Created by vedantdasswain on 25/03/15.
  */
-public class getMeetupsTask extends AsyncTask<Void, Void, String> {
+public class getMeetupsTask extends AsyncTask<Void, Void, ApiCustomMessagesMeetupListMessage> {
     Context context;
     DataApi dataApi;
-    ApiCustomMessagesMeetupListMessage meetupsList;
     private OnGetMeetupsTaskCompleted listener;
 
     public final String TAG="getMeetupsTask";
@@ -30,21 +29,22 @@ public class getMeetupsTask extends AsyncTask<Void, Void, String> {
     }
 
     @Override
-    protected String doInBackground(Void... params) {
-        try{
-            meetupsList=dataApi.getMeetups().execute();
-            return "Retrieved meetups";
+    protected ApiCustomMessagesMeetupListMessage doInBackground(Void... params) {
+        ApiCustomMessagesMeetupListMessage meetupsList = null;
+        try {
+            meetupsList = dataApi.getMeetups().execute();
+            return meetupsList;
         } catch (IOException e) {
             Log.d(TAG, e.getMessage(), e);
             e.printStackTrace();
         }
-    return "Failed to get meetups";
+        return meetupsList;
     }
 
     @Override
-    protected void onPostExecute(String message){
-        Log.v(TAG, message);
+    protected void onPostExecute(ApiCustomMessagesMeetupListMessage meetupsList){
+        Log.v(TAG, meetupsList.toString());
         listener.onTaskCompleted(meetupsList);
-        return ;
+        return;
     }
 }
