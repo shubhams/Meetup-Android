@@ -22,17 +22,19 @@ public class contactsTask extends AsyncTask<Void, Void, String> {
 
     public final String TAG="contactsTask";
 
-    public contactsTask(Context context, UsersApi usersApi,OnContactsTaskCompleted listener) {
+    public contactsTask(Context context, UsersApi usersApi, OnContactsTaskCompleted listener) {
         this.context = context;
 //        this.builder = builder;
         this.usersApi = usersApi;
-        this.listener=listener;
+        this.listener = listener;
     }
 
     @Override
     protected String doInBackground(Void... params) {
         try {
-            contactsList=usersApi.refreshContacts().execute();
+
+            // This function fetches the current friends.
+            contactsList=usersApi.getFriends().execute();
 
             return "Retrieved contacts";
         } catch (IOException e) {

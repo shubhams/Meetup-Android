@@ -22,7 +22,7 @@ public class getMeetupsTask extends AsyncTask<Void, Void, String> {
 
     public final String TAG="getMeetupsTask";
 
-    public getMeetupsTask(Context context, DataApi dataApi,OnGetMeetupsTaskCompleted listener) {
+    public getMeetupsTask(Context context, DataApi dataApi, OnGetMeetupsTaskCompleted listener) {
         this.context = context;
 //        this.builder = builder;
         this.dataApi = dataApi;

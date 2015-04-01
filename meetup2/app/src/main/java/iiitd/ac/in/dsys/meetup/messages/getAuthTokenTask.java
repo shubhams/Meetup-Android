@@ -7,7 +7,9 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesSuccessMessage;
 import com.appspot.intense_terra_821.users_api.UsersApi;
+import com.appspot.intense_terra_821.users_api.model.ApiCustomMessagesFriendsProfilesMessage;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
@@ -32,6 +34,7 @@ public class getAuthTokenTask extends AsyncTask<Void,Void,String> {
     Activity mActivity;
     String mEmail;
     firstLoginTask loginTask;
+    ApiCustomMessagesSuccessMessage success;
 
     String TAG="getAuthTokenTask";
 
