@@ -98,7 +98,7 @@ public class StartMeetupActivity extends ActionBarActivity
         Log.v(TAG, "Start fetching meetups...");
         usersApiInst= CommonUtils.getUsersApiInst();
         progressDialog=ProgressDialog.show(this, "Wait", "Fetching contacts...");
-        (new contactsTask(this, usersApiInst,this)).execute();
+        (new contactsTask(this, usersApiInst, this)).execute();
     }
 
 

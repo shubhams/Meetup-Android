@@ -295,7 +295,7 @@ public class MainActivity extends ActionBarActivity implements OnContactsTaskCom
         credential.setSelectedAccountName(settings.getString("ACCOUNT_NAME", null));
         if (credential.getSelectedAccountName() != null) {
             // Already signed in, begin app!
-            //Toast.makeText(getBaseContext(), "Logged in with : " + credential.getSelectedAccountName(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getBaseContext(), "Logged in with : " + credential.getSelectedAccountName(), Toast.LENGTH_SHORT).show();
             this.accountEmail = credential.getSelectedAccountName();
             Log.v(TAG,"Email stored: "+this.accountEmail);
         } else {
@@ -315,7 +315,7 @@ public class MainActivity extends ActionBarActivity implements OnContactsTaskCom
                                     AccountManager.KEY_ACCOUNT_NAME);
                     if (accountName != null) {
                         setAccountEmail(accountName);
-                        Toast.makeText(getBaseContext(), "Logged in with : " + credential.getSelectedAccountName(), Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(getBaseContext(), "Logged in with : " + credential.getSelectedAccountName(), Toast.LENGTH_SHORT).show();
                     }
                 }
                 break;
