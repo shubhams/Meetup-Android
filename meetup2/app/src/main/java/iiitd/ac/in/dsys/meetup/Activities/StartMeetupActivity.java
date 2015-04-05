@@ -21,6 +21,7 @@ import com.appspot.intense_terra_821.users_api.model.ApiCustomMessagesFriendsPro
 import com.appspot.intense_terra_821.users_api.model.ApiCustomMessagesProfileMessageFriendMessage;
 import com.google.api.client.util.DateTime;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -150,12 +151,12 @@ public class StartMeetupActivity extends ActionBarActivity
 
         meetupName=ed.getText().toString();
 
-//        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
 //        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         Log.v(TAG,meetupName+" on "+c.getTimeZone());
 
-        timeToArrive=new DateTime(c.getTime());
+        timeToArrive=new DateTime(sdf.format(c.getTime()).toString());
 
         Log.v(TAG,"DateTime "+timeToArrive);
 
