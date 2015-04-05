@@ -95,7 +95,7 @@ public class MainActivity extends ActionBarActivity implements OnContactsTaskCom
         // add UI Callbacks
         setUICallbacks();
         // build services. Set the first param to true to test locally. Second param is local IP of server.
-        buildApiServices(true, "192.168.48.103");
+        buildApiServices(true, "192.168.0.101");
 
         // Check device for Play Services APK.
         if (checkPlayServices()) {
