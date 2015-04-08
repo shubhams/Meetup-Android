@@ -5,18 +5,34 @@ package iiitd.ac.in.dsys.meetup.ObjectClasses;
  */
 public class MeetupObject {
     private String name,owner;
-    private float lat,lon;
-    private long timeOfArrival;
-    private boolean isActive;
+    private double lat=0,lon=0;
+    private long timeOfArrival=0;
+    private boolean isActive,isAccepted;
 
-    public MeetupObject(String name,String owner,boolean isActive,
-                        float lat,float lon,long timeOfArrival,String location){
+    public MeetupObject(String name,String owner,boolean isActive,boolean isAccepted){
         this.name=name;
-        this.lat=lat;
-        this.lon=lon;
-        this.timeOfArrival=timeOfArrival;
+//        this.lat=lat;
+//        this.lon=lon;
+//        this.timeOfArrival=timeOfArrival;
         this.owner=owner;
         this.isActive=isActive;
+        this.isAccepted=isAccepted;
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if(o.getClass().equals(this.getClass())) {
+            MeetupObject mo=(MeetupObject)o;
+            if(this.name.equals(mo.getName()) &&
+                    this.owner.equals(mo.getOwner()) &&
+                    this.lat==mo.getLat() &&
+                    this.lon==mo.getLon() &&
+                    this.timeOfArrival== mo.getTimeOfArrival() &&
+                    this.isActive==mo.getActive()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public String getName(){
@@ -27,11 +43,11 @@ public class MeetupObject {
         return owner;
     }
 
-    public float getLat(){
+    public double getLat(){
         return lat;
     }
 
-    public float getLon(){
+    public double getLon(){
         return lon;
     }
 
@@ -43,6 +59,10 @@ public class MeetupObject {
         return isActive;
     }
 
+    public boolean getAccepted(){
+        return isAccepted;
+    }
+
     public void setName(String name){
         this.name=name;
     }
@@ -51,11 +71,11 @@ public class MeetupObject {
         this.owner=owner;
     }
 
-    public void setLat(float lat){
+    public void setLat(double lat){
         this.lat=lat;
     }
 
-    public void setLon(float lon){
+    public void setLon(double lon){
         this.lon=lon;
     }
 
@@ -67,5 +87,8 @@ public class MeetupObject {
         this.isActive=isActive;
     }
 
+    public void setAccepted(boolean isAccepted){
+        this.isAccepted=isAccepted;
+    }
 
 }

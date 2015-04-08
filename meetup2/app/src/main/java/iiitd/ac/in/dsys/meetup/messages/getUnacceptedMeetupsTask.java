@@ -3,23 +3,25 @@ package iiitd.ac.in.dsys.meetup.messages;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+
 import com.appspot.intense_terra_821.data_api.DataApi;
 import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesMeetupListMessage;
-import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnGetMeetupsTaskCompleted;
 
 import java.io.IOException;
 
+import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnGetMeetupsTaskCompleted;
+
 /**
- * Created by vedantdasswain on 25/03/15.
+ * Created by vedantdasswain on 08/04/15.
  */
-public class getMeetupsTask extends AsyncTask<Void, Void, ApiCustomMessagesMeetupListMessage> {
+public class getUnacceptedMeetupsTask extends AsyncTask<Void, Void, ApiCustomMessagesMeetupListMessage> {
     Context context;
     DataApi dataApi;
     private OnGetMeetupsTaskCompleted listener;
 
-    public final String TAG="getMeetupsTask";
+    public final String TAG="getUnMeetupsTask";
 
-    public getMeetupsTask(Context context, DataApi dataApi, OnGetMeetupsTaskCompleted listener) {
+    public getUnacceptedMeetupsTask(Context context, DataApi dataApi, OnGetMeetupsTaskCompleted listener) {
         this.context = context;
 //        this.builder = builder;
         this.dataApi = dataApi;
@@ -30,7 +32,7 @@ public class getMeetupsTask extends AsyncTask<Void, Void, ApiCustomMessagesMeetu
     protected ApiCustomMessagesMeetupListMessage doInBackground(Void... params) {
         ApiCustomMessagesMeetupListMessage meetupsList = new ApiCustomMessagesMeetupListMessage();
         try {
-            meetupsList = dataApi.getMeetups().execute();
+            meetupsList = dataApi.getMeetupsUnaccepted().execute();
             return meetupsList;
         } catch (IOException e) {
             Log.d(TAG, e.getMessage(), e);
@@ -41,14 +43,9 @@ public class getMeetupsTask extends AsyncTask<Void, Void, ApiCustomMessagesMeetu
 
     @Override
     protected void onPostExecute(ApiCustomMessagesMeetupListMessage meetupsList){
-        if(meetupsList!=null)
-        {
-            Log.v(TAG, meetupsList.toString());
-            listener.onTaskCompleted(meetupsList,true);
-            (new getUnacceptedMeetupsTask(context, dataApi,listener)).execute();
-        }
-        else
-            Log.d(TAG,"meetupsList is empty");
+        Log.v(TAG, meetupsList.toString());
+        listener.onTaskCompleted(meetupsList,false);
         return;
     }
 }
+

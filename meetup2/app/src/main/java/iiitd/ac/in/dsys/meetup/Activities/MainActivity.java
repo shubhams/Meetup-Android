@@ -31,6 +31,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import iiitd.ac.in.dsys.meetup.CommonUtils;
 import iiitd.ac.in.dsys.meetup.R;
 import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnContactsTaskCompleted;
+import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnFirstLoginTaskCompleted;
 import iiitd.ac.in.dsys.meetup.messages.contactsTask;
 import iiitd.ac.in.dsys.meetup.messages.firstLoginTask;
 import iiitd.ac.in.dsys.meetup.messages.getAuthTokenTask;
@@ -42,7 +43,7 @@ import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-public class MainActivity extends ActionBarActivity implements OnContactsTaskCompleted{
+public class MainActivity extends ActionBarActivity implements OnContactsTaskCompleted, OnFirstLoginTaskCompleted{
     Context context;
     private SharedPreferences settings;
     String TAG="MainActivity";
@@ -261,7 +262,8 @@ public class MainActivity extends ActionBarActivity implements OnContactsTaskCom
                         getApplicationContext(),
                         "0000000000",
                         regid,
-                        usersApiInst
+                        usersApiInst,
+                        MainActivity.this
                 )).execute();
             }
         });
@@ -333,7 +335,8 @@ public class MainActivity extends ActionBarActivity implements OnContactsTaskCom
                     @Override
                     protected void onPostExecute(String ShortLivedAuthorizationToken) {
                         if (regid != null && ShortLivedAuthorizationToken != null) {
-                            firstLoginTask aLoginTask = new firstLoginTask(getApplicationContext(), usersApiInst, accountEmail, "00000000", regid);
+                            firstLoginTask aLoginTask = new firstLoginTask(getApplicationContext()
+                                    , usersApiInst, accountEmail, "00000000", regid,MainActivity.this);
                             aLoginTask.addTokenToMessage(ShortLivedAuthorizationToken);
                             aLoginTask.execute();
                         }
@@ -395,8 +398,20 @@ public class MainActivity extends ActionBarActivity implements OnContactsTaskCom
 
     }
 
+    //ContactsTask
     @Override
     public void onTaskCompleted(ApiCustomMessagesFriendsProfilesMessage contactsList) {
 
+    }
+
+    //LoginTask
+    @Override
+    public void onTaskCompleted(String reply) {
+        if(reply.equals("Success")) {
+            Intent i = new Intent(MainActivity.this, HomeActivity.class);
+            startActivity(i);
+            // close this activity
+            finish();
+        }
     }
 }

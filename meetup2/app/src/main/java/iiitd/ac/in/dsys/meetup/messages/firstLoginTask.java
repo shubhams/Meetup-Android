@@ -11,6 +11,8 @@ import com.appspot.intense_terra_821.users_api.model.ApiCustomMessagesUpFirstLog
 
 import java.io.IOException;
 
+import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnFirstLoginTaskCompleted;
+
 /**
  * Created by aditya on 14/02/15.
  */
@@ -18,9 +20,11 @@ public class firstLoginTask extends AsyncTask<Void, Void, ApiCustomMessagesSucce
     Context context;
     UsersApi usersApi;
     ApiCustomMessagesUpFirstLoginMessage firstLoginMessage;
+    OnFirstLoginTaskCompleted listener;
     String TAG="firstLoginTask";
 
-    public firstLoginTask(Context context, UsersApi usersApi, String fullName, String phNumber, String regID) {
+    public firstLoginTask(Context context, UsersApi usersApi, String fullName, String phNumber, String regID,
+                          OnFirstLoginTaskCompleted listener) {
         this(context, usersApi,
                 new ApiCustomMessagesUpFirstLoginMessage().setRegID(regID).setName(fullName).setPhNumber(phNumber));
     }
@@ -49,6 +53,7 @@ public class firstLoginTask extends AsyncTask<Void, Void, ApiCustomMessagesSucce
         if (reply != null) {
             Toast.makeText(context, reply.getStrValue(), Toast.LENGTH_LONG).show();
             Log.v(TAG,reply.getStrValue());
+            listener.onTaskCompleted("Success");
         }
     }
 

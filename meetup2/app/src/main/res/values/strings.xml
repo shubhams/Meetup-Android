@@ -20,5 +20,6 @@
     <string name="action_next">Next</string>
     <string name="action_previous">Previous</string>
     <string name="title_activity_start_meetup">New Meetup</string>
+    <string name="title_activity_meetup">MeetupActivity</string>
 
 </resources>

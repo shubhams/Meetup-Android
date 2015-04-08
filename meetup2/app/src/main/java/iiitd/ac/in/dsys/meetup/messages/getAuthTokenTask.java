@@ -9,7 +9,6 @@ import android.util.Log;
 
 import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesSuccessMessage;
 import com.appspot.intense_terra_821.users_api.UsersApi;
-import com.appspot.intense_terra_821.users_api.model.ApiCustomMessagesFriendsProfilesMessage;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
@@ -17,6 +16,8 @@ import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import java.io.IOException;
+
+import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnFirstLoginTaskCompleted;
 
 /**
  * Created by aditya on 16/02/15.
@@ -35,6 +36,7 @@ public class getAuthTokenTask extends AsyncTask<Void,Void,String> {
     String mEmail;
     firstLoginTask loginTask;
     ApiCustomMessagesSuccessMessage success;
+    OnFirstLoginTaskCompleted listener;
 
     String TAG="getAuthTokenTask";
 
@@ -43,10 +45,12 @@ public class getAuthTokenTask extends AsyncTask<Void,Void,String> {
         this.mEmail = mEmail;
     }
 
-    public getAuthTokenTask(Activity activity, String mEmail, Context c, String phNum, String regId, UsersApi api) {
+    public getAuthTokenTask(Activity activity, String mEmail, Context c, String phNum, String regId,
+                            UsersApi api, OnFirstLoginTaskCompleted listener) {
         this.mActivity = activity;
         this.mEmail = mEmail;
-        loginTask = new firstLoginTask(c, api, mEmail, phNum, regId);
+        this.listener=listener;
+        loginTask = new firstLoginTask(c, api, mEmail, phNum, regId,listener);
     }
 
 
