@@ -9,9 +9,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.appspot.intense_terra_821.data_api.DataApi;
 import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesMeetupDescMessage;
+import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesSuccessMessage;
 
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
@@ -19,10 +21,13 @@ import java.util.TimeZone;
 import iiitd.ac.in.dsys.meetup.CommonUtils;
 import iiitd.ac.in.dsys.meetup.ObjectClasses.MeetupObject;
 import iiitd.ac.in.dsys.meetup.R;
+import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnAcceptMeetupTaskCompleted;
 import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnGetMeetupDetailsTaskCompleted;
+import iiitd.ac.in.dsys.meetup.messages.acceptMeetupTask;
 import iiitd.ac.in.dsys.meetup.messages.getMeetupDetailsTask;
 
-public class MeetupActivity extends ActionBarActivity implements OnGetMeetupDetailsTaskCompleted {
+public class MeetupActivity extends ActionBarActivity
+        implements OnGetMeetupDetailsTaskCompleted,OnAcceptMeetupTaskCompleted {
 
     private static final String TAG ="MeetupActivity" ;
     private DataApi dataApiInst;
@@ -53,9 +58,6 @@ public class MeetupActivity extends ActionBarActivity implements OnGetMeetupDeta
     private void setUI(){
         meetupName=(TextView)findViewById(R.id.meetupName);
         meetupName.setText(mo.getName());
-        if(!mo.getAccepted())
-            meetupName.setTextColor(getResources()
-                    .getColor(R.color.dim_foreground_disabled_material_light));
 
         owner=(TextView)findViewById(R.id.owner);
         owner.setText(mo.getOwner());
@@ -67,6 +69,10 @@ public class MeetupActivity extends ActionBarActivity implements OnGetMeetupDeta
         acceptBtn=(Button)findViewById(R.id.acceptBtn);
         if(mo.getAccepted())
             acceptBtn.setVisibility(View.INVISIBLE);
+    }
+
+    public void onAccept(View v){
+        (new acceptMeetupTask(this, dataApiInst,mo, this)).execute();
     }
 
     private void fillUI(){
@@ -97,6 +103,7 @@ public class MeetupActivity extends ActionBarActivity implements OnGetMeetupDeta
         return super.onOptionsItemSelected(item);
     }
 
+    //GetMeetups Task
     @Override
     public void onTaskCompleted(ApiCustomMessagesMeetupDescMessage meetupDesc) {
         if(meetupDesc!=null) {
@@ -106,6 +113,18 @@ public class MeetupActivity extends ActionBarActivity implements OnGetMeetupDeta
             mo.setLon(meetupDesc.getLonDestination());
             mo.setTimeOfArrival(meetupDesc.getTimeToArrive().getValue());
             fillUI();
+        }
+    }
+
+    //AcceptMeetups Task
+    @Override
+    public void onTaskCompleted(ApiCustomMessagesSuccessMessage meetupSuccess) {
+        if(meetupSuccess!=null){
+            Log.v(TAG,"Accept: "+ meetupSuccess.getStrValue());
+            if(meetupSuccess.getStrValue().equals("Success")){
+                Toast.makeText(this,"Welcome to the meetup",Toast.LENGTH_SHORT).show();
+                acceptBtn.setVisibility(View.INVISIBLE);
+            }
         }
     }
 }
