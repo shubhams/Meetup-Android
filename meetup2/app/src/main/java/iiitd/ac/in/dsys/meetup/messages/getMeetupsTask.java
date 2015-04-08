@@ -3,13 +3,11 @@ package iiitd.ac.in.dsys.meetup.messages;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-
 import com.appspot.intense_terra_821.data_api.DataApi;
 import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesMeetupListMessage;
+import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnGetMeetupsTaskCompleted;
 
 import java.io.IOException;
-
-import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnGetMeetupsTaskCompleted;
 
 /**
  * Created by vedantdasswain on 25/03/15.
@@ -43,8 +41,13 @@ public class getMeetupsTask extends AsyncTask<Void, Void, ApiCustomMessagesMeetu
 
     @Override
     protected void onPostExecute(ApiCustomMessagesMeetupListMessage meetupsList){
-        Log.v(TAG, meetupsList.toString());
-        listener.onTaskCompleted(meetupsList);
+        if(meetupsList!=null)
+        {
+            Log.v(TAG, meetupsList.toString());
+            listener.onTaskCompleted(meetupsList);
+        }
+        else
+            Log.d(TAG,"meetupsList is empty");
         return;
     }
 }
