@@ -10,6 +10,7 @@ import android.widget.CompoundButton;
 
 import java.util.ArrayList;
 
+import iiitd.ac.in.dsys.meetup.ObjectClasses.ContactObject;
 import iiitd.ac.in.dsys.meetup.R;
 
 /**
@@ -17,10 +18,10 @@ import iiitd.ac.in.dsys.meetup.R;
  */
 public class ContactsListAdapter extends ArrayAdapter {
     private final Context context;
-    private final ArrayList<String> entryObjectList;
+    private final ArrayList<ContactObject> entryObjectList;
     CompoundButton.OnCheckedChangeListener listener;
 
-    public ContactsListAdapter(Context context, ArrayList<String> objectList,
+    public ContactsListAdapter(Context context, ArrayList<ContactObject> objectList,
                                CompoundButton.OnCheckedChangeListener listener) {
         super(context, R.layout.list_item_meetup, objectList);
         this.context = context;
@@ -34,7 +35,8 @@ public class ContactsListAdapter extends ArrayAdapter {
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.list_item_contact, parent, false);
         CheckBox contactCB = (CheckBox) rowView.findViewById(R.id.contactCheckBox);
-        contactCB.setText(entryObjectList.get(position));
+        contactCB.setText(entryObjectList.get(position).getName());
+        contactCB.setChecked(entryObjectList.get(position).getInvited());
         contactCB.setOnCheckedChangeListener(listener);
 //        TextView timeTextView = (TextView)rowView.findViewById(R.id.timeTV);
 //        timeTextView.setText(""+entryObjectList.get(position).getTimeOfArrival());

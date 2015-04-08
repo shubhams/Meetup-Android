@@ -79,6 +79,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="iiitd.ac.in.dsys.meetup.Activities.HomeActivity" />
         </activity>
+        <activity
+            android:name=".Activities.MeetupActivity"
+            android:label="@string/title_activity_meetup"
+            android:parentActivityName=".Activities.HomeActivity" >
+        </activity>
     </application>
 
 </manifest>

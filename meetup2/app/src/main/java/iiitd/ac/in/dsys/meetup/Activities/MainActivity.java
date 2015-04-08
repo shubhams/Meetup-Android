@@ -38,13 +38,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import iiitd.ac.in.dsys.meetup.CommonUtils;
 import iiitd.ac.in.dsys.meetup.R;
 import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnContactsTaskCompleted;
+import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnFirstLoginTaskCompleted;
 import iiitd.ac.in.dsys.meetup.messages.contactsTask;
 import iiitd.ac.in.dsys.meetup.messages.firstLoginTask;
 import iiitd.ac.in.dsys.meetup.messages.getAuthTokenTask;
 import iiitd.ac.in.dsys.meetup.messages.pingHelloTask;
 
 
-public class MainActivity extends ActionBarActivity implements OnContactsTaskCompleted{
+public class MainActivity extends ActionBarActivity implements OnContactsTaskCompleted, OnFirstLoginTaskCompleted{
     Context context;
     private SharedPreferences settings;
     String TAG="MainActivity";
@@ -95,7 +96,7 @@ public class MainActivity extends ActionBarActivity implements OnContactsTaskCom
         // add UI Callbacks
         setUICallbacks();
         // build services. Set the first param to true to test locally. Second param is local IP of server.
-        buildApiServices(true, "192.168.0.101");
+        buildApiServices(true, "192.168.1.3");
 
         // Check device for Play Services APK.
         if (checkPlayServices()) {
@@ -263,7 +264,8 @@ public class MainActivity extends ActionBarActivity implements OnContactsTaskCom
                         getApplicationContext(),
                         "0000000000",
                         regid,
-                        usersApiInst
+                        usersApiInst,
+                        MainActivity.this
                 )).execute();
             }
         });
@@ -335,7 +337,8 @@ public class MainActivity extends ActionBarActivity implements OnContactsTaskCom
                     @Override
                     protected void onPostExecute(String ShortLivedAuthorizationToken) {
                         if (regid != null && ShortLivedAuthorizationToken != null) {
-                            firstLoginTask aLoginTask = new firstLoginTask(getApplicationContext(), usersApiInst, accountEmail, "00000000", regid);
+                            firstLoginTask aLoginTask = new firstLoginTask(getApplicationContext()
+                                    , usersApiInst, accountEmail, "00000000", regid,MainActivity.this);
                             aLoginTask.addTokenToMessage(ShortLivedAuthorizationToken);
                             aLoginTask.execute();
                         }
@@ -397,8 +400,20 @@ public class MainActivity extends ActionBarActivity implements OnContactsTaskCom
 
     }
 
+    //ContactsTask
     @Override
     public void onTaskCompleted(ApiCustomMessagesFriendsProfilesMessage contactsList) {
 
+    }
+
+    //LoginTask
+    @Override
+    public void onTaskCompleted(String reply) {
+        if(reply.equals("Success")) {
+            Intent i = new Intent(MainActivity.this, HomeActivity.class);
+            startActivity(i);
+            // close this activity
+            finish();
+        }
     }
 }

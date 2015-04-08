@@ -28,6 +28,7 @@ import java.util.TimeZone;
 
 import iiitd.ac.in.dsys.meetup.CommonUtils;
 import iiitd.ac.in.dsys.meetup.CustomUI.ContactsListAdapter;
+import iiitd.ac.in.dsys.meetup.ObjectClasses.ContactObject;
 import iiitd.ac.in.dsys.meetup.R;
 import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnContactsTaskCompleted;
 import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnMakeMeetupTaskCompleted;
@@ -40,7 +41,8 @@ public class StartMeetupActivity extends ActionBarActivity
 
     private static final String TAG ="StartMeetupActivity" ;
     ContactsListAdapter contactsListAdapter;
-    ArrayList<String> contacts,invitees;
+    ArrayList<String> invitees;
+    ArrayList<ContactObject> contacts;
     ListView lv;
     DatePicker dp;
     TimePicker tp;
@@ -63,7 +65,7 @@ public class StartMeetupActivity extends ActionBarActivity
         tp=(TimePicker)findViewById(R.id.timePicker);
         vf=(ViewFlipper) findViewById(R.id.viewFlipper);
         ed=(EditText) findViewById(R.id.meetupEditText);
-        contacts=new ArrayList<String>();
+        contacts=new ArrayList<ContactObject>();
         invitees=new ArrayList<String>();
         progressDialog=new ProgressDialog(this);
         dataApiInst= CommonUtils.getDataApiInst();
@@ -146,15 +148,15 @@ public class StartMeetupActivity extends ActionBarActivity
         int hourOfDay=tp.getCurrentHour();
         int minute=tp.getCurrentMinute();
 
-        c.set(year,month,day,hourOfDay,minute);
-//        c.setTimeZone(TimeZone.getTimeZone("UTC"));
+        c.set(year,month,day,hourOfDay+1,minute);
 
+        Log.v(TAG,"Calendar: "+c.toString());
         meetupName=ed.getText().toString();
 
         SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
 //        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-        Log.v(TAG,meetupName+" on "+c.getTimeZone());
+//        Log.v(TAG,meetupName+" on "+c.getTimeZone());
 
         timeToArrive=new DateTime(sdf.format(c.getTime()).toString());
 
@@ -198,8 +200,9 @@ public class StartMeetupActivity extends ActionBarActivity
             Log.v(TAG,"Success message"+contactsList.getSuccess().getStrValue());
             if (!contactsList.isEmpty() && contactsList.getProfiles() != null)
                 for (ApiCustomMessagesProfileMessageFriendMessage name : contactsList.getProfiles()) {
-                    if(contacts.indexOf(name.getEmail())<0)
-                        contacts.add(name.getEmail());
+                    ContactObject contact=new ContactObject(name.getEmail(),false);
+                    if(!contacts.contains(contact))
+                        contacts.add(contact);
                     Log.v(TAG, "Email name: " + name.getEmail());
                 }
             else {
@@ -219,10 +222,14 @@ public class StartMeetupActivity extends ActionBarActivity
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         int pos = lv.getPositionForView(buttonView);
         if (pos != ListView.INVALID_POSITION) {
-            if(isChecked)
-                invitees.add(contacts.get(pos));
-            else
-                invitees.remove(contacts.get(pos));
+            if(isChecked) {
+                invitees.add(contacts.get(pos).getName());
+                contacts.get(pos).setInvited(true);
+            }
+            else {
+                invitees.remove(contacts.get(pos).getName());
+                contacts.get(pos).setInvited(false);
+            }
         }
     }
 
@@ -231,5 +238,8 @@ public class StartMeetupActivity extends ActionBarActivity
         progressDialog.dismiss();
         progressDialog.cancel();
         Log.v(TAG,"Meetup creation: "+message);
+        Toast.makeText(this,"Meetup creation: "+message,Toast.LENGTH_SHORT).show();
+        if(message.equals("Success"))
+            finish();
     }
 }

@@ -6,5 +6,5 @@ import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesMeetupListM
  * Created by vedantdasswain on 25/03/15.
  */
 public interface OnGetMeetupsTaskCompleted {
-    void onTaskCompleted(ApiCustomMessagesMeetupListMessage meetupsList);
+    void onTaskCompleted(ApiCustomMessagesMeetupListMessage meetupsList,Boolean accepted);
 }

@@ -1,6 +1,7 @@
 package iiitd.ac.in.dsys.meetup.DrawerSectionFragments;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
@@ -12,8 +13,12 @@ import com.appspot.intense_terra_821.data_api.DataApi;
 import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesMeetupListMessage;
 import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesMeetupMessage;
 
+import java.util.ArrayList;
+
+import iiitd.ac.in.dsys.meetup.Activities.MeetupActivity;
 import iiitd.ac.in.dsys.meetup.CommonUtils;
 import iiitd.ac.in.dsys.meetup.CustomUI.MeetupListAdapter;
+import iiitd.ac.in.dsys.meetup.ObjectClasses.MeetupObject;
 import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnGetMeetupsTaskCompleted;
 import iiitd.ac.in.dsys.meetup.messages.getMeetupsTask;
 
@@ -37,6 +42,7 @@ public class MeetupListFragment extends ListFragment implements OnGetMeetupsTask
 
     private OnFragmentInteractionListener mListener;
     private MeetupListAdapter adapter;
+    private ArrayList<MeetupObject> meetupObjectsList;
     private static final String TAG="MeetupListFragment";
 
     // TODO: Rename and change types of parameters
@@ -66,6 +72,8 @@ public class MeetupListFragment extends ListFragment implements OnGetMeetupsTask
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        meetupObjectsList=new ArrayList<MeetupObject>();
     }
 
     @Override
@@ -102,42 +110,54 @@ public class MeetupListFragment extends ListFragment implements OnGetMeetupsTask
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
+//        super.onListItemClick(l, v, position, id);
+        Intent i = new Intent(getActivity(),MeetupActivity.class);
+        i.putExtra("name",meetupObjectsList.get(position).getName());
+        i.putExtra("owner",meetupObjectsList.get(position).getOwner());
+        i.putExtra("active",meetupObjectsList.get(position).getActive());
+        i.putExtra("accepted",meetupObjectsList.get(position).getAccepted());
+
+
+        startActivity(i);
     }
 
     @Override
-    public void onTaskCompleted(ApiCustomMessagesMeetupListMessage meetupsList) {
+    public void onTaskCompleted(ApiCustomMessagesMeetupListMessage meetupsList,Boolean accepted) {
         if(meetupsList!=null) {
-            Log.v(TAG, "Success message: " + meetupsList.getSuccess().getStrValue());
-            if (!meetupsList.isEmpty() && meetupsList.getMeetups() != null)
-                for (ApiCustomMessagesMeetupMessage meetup : meetupsList.getMeetups())
-                    Log.v(TAG, "Meetup: " + meetup.getName() +" by "+ meetup.getOwner()
-                            +"Is active: "+meetup.getActive());
-            else
-                Log.v(TAG, "No meetups");
+            if(meetupsList.getSuccess()!=null)
+                Log.v(TAG, "Success message: " + meetupsList.getSuccess().getStrValue());
+            if (!meetupsList.isEmpty() && meetupsList.getMeetups() != null) {
+                for (ApiCustomMessagesMeetupMessage meetup : meetupsList.getMeetups()) {
+                    MeetupObject mo = new MeetupObject(meetup.getName(), meetup.getOwner(), meetup.getActive(),accepted);
+                    if(!meetupObjectsList.contains(mo))
+                        meetupObjectsList.add(mo);
+                }
+                adapter=new MeetupListAdapter(getActivity(),meetupObjectsList);
+            }
+            else {
+                if(accepted)
+                    Log.v(TAG, "No accepted meetups");
+                else
+                    Log.v(TAG, "No pending meetups ");
+            }
         }
 
         if(adapter!=null && !adapter.isEmpty()) {
 //            Log.v(TAG,"adapter no null not empty");
             setListAdapter(adapter);
         }
-        else {
+        else{
             setListShown(true);
-            Toast.makeText(getActivity(),"You aren't involved in any meetups",Toast.LENGTH_SHORT).show();
-            Toast.makeText(getActivity(),"Start your own by clicking the plus",Toast.LENGTH_SHORT).show();
+            if(accepted==true) {
+                Toast.makeText(getActivity(), "You aren't involved in any meetups", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Start your own by clicking the plus", Toast.LENGTH_SHORT).show();
+            }
+            else{
+                Toast.makeText(getActivity(), "You have no pending meetup invites", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         public void onFragmentInteraction(String id);

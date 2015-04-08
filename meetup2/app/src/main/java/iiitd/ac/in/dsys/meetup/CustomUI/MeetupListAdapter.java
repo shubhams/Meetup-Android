@@ -17,6 +17,7 @@ import iiitd.ac.in.dsys.meetup.R;
  * Created by vedantdasswain on 24/03/15.
  */
 public class MeetupListAdapter extends ArrayAdapter {
+    private static final String TAG ="MeetupListAdapter" ;
     private final Context context;
     private final ArrayList<MeetupObject> entryObjectList;
 
@@ -33,12 +34,16 @@ public class MeetupListAdapter extends ArrayAdapter {
         View rowView = inflater.inflate(R.layout.list_item_meetup, parent, false);
         TextView nameTextView = (TextView)rowView.findViewById(R.id.nameTV);
         nameTextView.setText(entryObjectList.get(position).getName());
-//        TextView timeTextView = (TextView)rowView.findViewById(R.id.timeTV);
-//        timeTextView.setText(""+entryObjectList.get(position).getTimeOfArrival());
+
+        if(!entryObjectList.get(position).getAccepted())
+            nameTextView.setTextColor(context.getResources()
+                    .getColor(R.color.dim_foreground_disabled_material_light));
+
         TextView ownerTextView = (TextView) rowView.findViewById(R.id.ownerTV);
         ownerTextView.setText(entryObjectList.get(position).getOwner());
         Switch sw=(Switch) rowView.findViewById(R.id.switch1);
         sw.setChecked(entryObjectList.get(position).getActive());
         return rowView;
     }
+
 }
