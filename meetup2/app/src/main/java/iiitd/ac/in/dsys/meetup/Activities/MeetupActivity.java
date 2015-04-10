@@ -221,6 +221,7 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
         for(int i=0;i<userMeetupLocations.size();++i)
         {
             Log.d(TAG,userMeetupLocations.get(i).toString());
+            mMap.clear();
             ApiCustomMessagesPeepLocationsMessage peepLocationsMessage = userMeetupLocations.get(i);
             String userName = peepLocationsMessage.getName();
             String userEmail = peepLocationsMessage.getEmail();
@@ -228,7 +229,7 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
             LatLng latLng = new LatLng(userLoc.getLat(),userLoc.getLon());
             //Comment the line below to see your location also, as a marker on the map
             if(!peepLocationsMessage.getEmail().equals(mo.getOwner()))
-                MeetupActivity.mMap.addMarker(new MarkerOptions().position(latLng).title(userName).snippet(userEmail));
+                mMap.addMarker(new MarkerOptions().position(latLng).title(userName).snippet(userEmail));
         }
     }
 }
