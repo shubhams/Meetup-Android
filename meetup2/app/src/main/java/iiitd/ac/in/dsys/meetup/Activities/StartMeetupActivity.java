@@ -85,14 +85,12 @@ public class StartMeetupActivity extends ActionBarActivity
         progressDialog=new ProgressDialog(this);
         dataApiInst= CommonUtils.getDataApiInst();
         googleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API).addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
-
-        //TODO call it where the view is inflated
-        makeMyMap();
     }
 
     @Override
     protected void onResume(){
         super.onResume();
+        makeMyMap();
         googleApiClient.connect();
         if(!contacts.isEmpty())
             contacts.clear();
