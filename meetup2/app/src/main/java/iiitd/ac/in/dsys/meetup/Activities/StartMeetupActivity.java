@@ -24,12 +24,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.*;
 import com.google.api.client.util.DateTime;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.TimeZone;
-
 import iiitd.ac.in.dsys.meetup.CommonUtils;
 import iiitd.ac.in.dsys.meetup.CustomUI.ContactsListAdapter;
 import iiitd.ac.in.dsys.meetup.ObjectClasses.ContactObject;
@@ -39,6 +33,7 @@ import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnMakeMeetupTaskCompleted;
 import iiitd.ac.in.dsys.meetup.messages.contactsTask;
 import iiitd.ac.in.dsys.meetup.messages.makeMeetupTask;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -98,6 +93,7 @@ public class StartMeetupActivity extends ActionBarActivity
     @Override
     protected void onResume(){
         super.onResume();
+        googleApiClient.connect();
         if(!contacts.isEmpty())
             contacts.clear();
     }
@@ -167,7 +163,6 @@ public class StartMeetupActivity extends ActionBarActivity
         googleMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                 .getMap();
 //        setUpMap(NewDelhi);
-        googleApiClient.connect();
     }
 
     private void setUpMap(LatLng myLatLng)
@@ -256,8 +251,8 @@ public class StartMeetupActivity extends ActionBarActivity
         createMessage.setInvited(invitees);
 
         createMessage.setTimeToArrive(timeToArrive);
-        createMessage.setLat((double) meetUpLocation.latitude);
-        createMessage.setLon((double) meetUpLocation.longitude);
+        createMessage.setLat( meetUpLocation.latitude);
+        createMessage.setLon( meetUpLocation.longitude);
 
         progressDialog=ProgressDialog.show(this, "Wait", "Creating meetup...");
         (new makeMeetupTask(this, dataApiInst,this,createMessage)).execute();
@@ -325,7 +320,10 @@ public class StartMeetupActivity extends ActionBarActivity
             setUpMap(latLng);
         }
         else
+        {
             Log.d(TAG,"last location found to be null");
+            setUpMap(NewDelhi);
+        }
     }
 
     @Override

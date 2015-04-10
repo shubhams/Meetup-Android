@@ -4,14 +4,12 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
-
 import com.appspot.intense_terra_821.users_api.UsersApi;
 import com.appspot.intense_terra_821.users_api.model.ApiCustomMessagesSuccessMessage;
 import com.appspot.intense_terra_821.users_api.model.ApiCustomMessagesUpFirstLoginMessage;
+import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnFirstLoginTaskCompleted;
 
 import java.io.IOException;
-
-import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnFirstLoginTaskCompleted;
 
 /**
  * Created by aditya on 14/02/15.
@@ -27,6 +25,7 @@ public class firstLoginTask extends AsyncTask<Void, Void, ApiCustomMessagesSucce
                           OnFirstLoginTaskCompleted listener) {
         this(context, usersApi,
                 new ApiCustomMessagesUpFirstLoginMessage().setRegID(regID).setName(fullName).setPhNumber(phNumber));
+        this.listener=listener;
     }
 
     public firstLoginTask(Context context, UsersApi usersApi, ApiCustomMessagesUpFirstLoginMessage firstLoginMessage) {
