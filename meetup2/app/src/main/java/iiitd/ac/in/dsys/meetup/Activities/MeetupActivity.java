@@ -1,5 +1,10 @@
 package iiitd.ac.in.dsys.meetup.Activities;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -11,8 +16,14 @@ import android.widget.Button;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.appspot.intense_terra_821.data_api.DataApi;
-import com.appspot.intense_terra_821.data_api.model.*;
+import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesLocationMessage;
+import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesMeetupDescMessage;
+import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesMeetupLocationsUpdateFullMessage;
+import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesPeepLocationsMessage;
+import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesSuccessMessage;
+import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesUpLocationMessage;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -23,22 +34,26 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import iiitd.ac.in.dsys.meetup.CommonUtils;
-import iiitd.ac.in.dsys.meetup.ObjectClasses.MeetupObject;
-import iiitd.ac.in.dsys.meetup.R;
-import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnAcceptMeetupTaskCompleted;
-import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnGetMeetupDetailsTaskCompleted;
-import iiitd.ac.in.dsys.meetup.messages.acceptMeetupTask;
-import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnHeartBeatCompleted;
-import iiitd.ac.in.dsys.meetup.messages.getMeetupDetailsTask;
-import iiitd.ac.in.dsys.meetup.messages.sendHeartBeatTask;
+
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.TimeZone;
 
+import iiitd.ac.in.dsys.meetup.CommonUtils;
+import iiitd.ac.in.dsys.meetup.Receivers.DeactivateAlarmReceiver;
+import iiitd.ac.in.dsys.meetup.ObjectClasses.MeetupObject;
+import iiitd.ac.in.dsys.meetup.R;
+import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnAcceptMeetupTaskCompleted;
+import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnActivateMeetupTaskCompleted;
+import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnGetMeetupDetailsTaskCompleted;
+import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnHeartBeatCompleted;
+import iiitd.ac.in.dsys.meetup.messages.acceptMeetupTask;
+import iiitd.ac.in.dsys.meetup.messages.getMeetupDetailsTask;
+import iiitd.ac.in.dsys.meetup.messages.sendHeartBeatTask;
+
 public class MeetupActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener,OnGetMeetupDetailsTaskCompleted,
-        OnHeartBeatCompleted, OnAcceptMeetupTaskCompleted
+        OnHeartBeatCompleted, OnAcceptMeetupTaskCompleted, OnActivateMeetupTaskCompleted
 {
 
     private static final String TAG ="MeetupActivity" ;
@@ -101,6 +116,22 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
 
     public void onAccept(View v){
         (new acceptMeetupTask(this, dataApiInst,mo, this)).execute();
+    }
+
+    public void onActiveToggle(View v){
+        if(switchActive.isChecked()){
+            //deactivate()
+        }
+        else{
+            SharedPreferences settings = getSharedPreferences("MeetupPreferences", 0);
+            String mEmail=settings.getString("ACCOUNT_NAME","");
+            if(mo.getOwner().equals(mEmail)){
+                //activate()
+            }
+            else{
+                Toast.makeText(this,"Only the can activate the meetup",Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void fillUI(){
@@ -245,6 +276,22 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
             //Comment the line below to see your location also, as a marker on the map
             if(!peepLocationsMessage.getEmail().equals(mo.getOwner()))
                 mMap.addMarker(new MarkerOptions().position(latLng).title(userName).snippet(userEmail));
+
+        }
+    }
+
+    @Override
+    public void onActivateTaskCompleted(ApiCustomMessagesSuccessMessage meetupSuccess) {
+        AlarmManager alarmMgr;
+        PendingIntent alarmIntent;
+
+        if(meetupSuccess.getStrValue().equalsIgnoreCase("success")){
+            alarmMgr = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+            Intent intent = new Intent(this, DeactivateAlarmReceiver.class);
+            alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+
+            alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, mo.getTimeOfArrival()+AlarmManager.INTERVAL_HOUR,
+                    AlarmManager.INTERVAL_FIFTEEN_MINUTES, alarmIntent);
 
         }
     }
