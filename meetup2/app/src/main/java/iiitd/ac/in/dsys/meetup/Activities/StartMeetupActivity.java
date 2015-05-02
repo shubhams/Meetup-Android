@@ -1,14 +1,20 @@
 package iiitd.ac.in.dsys.meetup.Activities;
 
 import android.app.ProgressDialog;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -19,6 +25,17 @@ import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesUpMeetupCre
 import com.appspot.intense_terra_821.users_api.UsersApi;
 import com.appspot.intense_terra_821.users_api.model.ApiCustomMessagesFriendsProfilesMessage;
 import com.appspot.intense_terra_821.users_api.model.ApiCustomMessagesProfileMessageFriendMessage;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.api.client.util.DateTime;
 
 import java.text.SimpleDateFormat;
@@ -37,9 +54,18 @@ import iiitd.ac.in.dsys.meetup.messages.makeMeetupTask;
 
 public class StartMeetupActivity extends ActionBarActivity
         implements OnContactsTaskCompleted,android.widget.CompoundButton.OnCheckedChangeListener
-                    ,OnMakeMeetupTaskCompleted{
+                    ,OnMakeMeetupTaskCompleted,GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG ="StartMeetupActivity" ;
+    LatLng meetUpLocation;
+    LinearLayout markerLayout;
+    ImageView markerIcon;
+    GoogleApiClient googleApiClient;
+    GoogleMap googleMap;
+    Location mLastLocation;
+    LatLng latLng;
+    LatLng center;
     ContactsListAdapter contactsListAdapter;
     ArrayList<String> invitees;
     ArrayList<ContactObject> contacts;
@@ -55,11 +81,14 @@ public class StartMeetupActivity extends ActionBarActivity
     DateTime timeToArrive;
     String meetupName="";
     double lat=28.546207,lon=77.272208;
+    static final LatLng NewDelhi = new LatLng(28.6139, 77.2089);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_meetup);
+        markerLayout = (LinearLayout) findViewById(R.id.locationMarker);
+        markerIcon = (ImageView) findViewById(R.id.icon_marker);
         lv=(ListView)findViewById(R.id.contactsListView);
         dp=(DatePicker)findViewById(R.id.datePicker);
         tp=(TimePicker)findViewById(R.id.timePicker);
@@ -69,11 +98,14 @@ public class StartMeetupActivity extends ActionBarActivity
         invitees=new ArrayList<String>();
         progressDialog=new ProgressDialog(this);
         dataApiInst= CommonUtils.getDataApiInst();
+        googleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API).addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
     }
 
     @Override
     protected void onResume(){
         super.onResume();
+        makeMyMap();
+        googleApiClient.connect();
         if(!contacts.isEmpty())
             contacts.clear();
     }
@@ -138,6 +170,52 @@ public class StartMeetupActivity extends ActionBarActivity
         return super.onOptionsItemSelected(item);
     }
 
+    private void makeMyMap()
+    {
+        googleMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
+                .getMap();
+//        setUpMap(NewDelhi);
+    }
+
+    private void setUpMap(LatLng myLatLng)
+    {
+        Log.d(TAG,"setUpMyMap called");
+        googleMap.clear();
+//        mMap.addMarker(new MarkerOptions().position(latLng).title("Here I am").snippet("Cool Bro!").draggable(true));
+        googleMap.setMyLocationEnabled(true);
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(myLatLng));
+        googleMap.animateCamera(CameraUpdateFactory.zoomTo(18),2000,null);
+        googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+            @Override
+            public void onCameraChange(CameraPosition cameraPosition) {
+                center = googleMap.getCameraPosition().target;
+                googleMap.clear();
+                markerLayout.setVisibility(View.VISIBLE);
+            }
+        });
+        markerLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bitmap bitmap = ((BitmapDrawable)markerIcon.getDrawable()).getBitmap();
+                bitmap = bitmap.createScaledBitmap(bitmap,75,75,false);
+                meetUpLocation = new LatLng(center.latitude,
+                        center.longitude);
+                Toast.makeText(getApplicationContext(), String.valueOf(center.latitude+" "+center.longitude),
+                        Toast.LENGTH_LONG).show();
+                Log.d(TAG, "Location coordinates:"+String.valueOf(center.latitude+" "+center.longitude));
+                        Marker m = googleMap.addMarker(new MarkerOptions()
+                        .position(meetUpLocation)
+                        .title(" Set your Location ")
+                        .snippet("")
+                        .icon(BitmapDescriptorFactory
+                                .fromBitmap(bitmap)));
+                m.setDraggable(true);
+                markerLayout.setVisibility(View.GONE);
+            }
+        });
+
+    }
+
     private void storeInputs() {
         Calendar c=Calendar.getInstance();
         c.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -185,8 +263,8 @@ public class StartMeetupActivity extends ActionBarActivity
         createMessage.setInvited(invitees);
 
         createMessage.setTimeToArrive(timeToArrive);
-        createMessage.setLat(lat);
-        createMessage.setLon(lon);
+        createMessage.setLat( meetUpLocation.latitude);
+        createMessage.setLon( meetUpLocation.longitude);
 
         progressDialog=ProgressDialog.show(this, "Wait", "Creating meetup...");
         (new makeMeetupTask(this, dataApiInst,this,createMessage)).execute();
@@ -241,5 +319,33 @@ public class StartMeetupActivity extends ActionBarActivity
         Toast.makeText(this,"Meetup creation: "+message,Toast.LENGTH_SHORT).show();
         if(message.equals("Success"))
             finish();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.d(TAG,"onConnected called");
+        Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+        if(mLastLocation!=null)
+        {
+            latLng = new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude());
+            setUpMap(latLng);
+        }
+        else
+        {
+            Log.d(TAG,"last location found to be null");
+            setUpMap(NewDelhi);
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+        Log.d(TAG,"onConnectionFailed called");
     }
 }

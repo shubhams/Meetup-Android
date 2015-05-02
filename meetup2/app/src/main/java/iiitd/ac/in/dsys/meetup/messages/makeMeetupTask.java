@@ -3,14 +3,12 @@ package iiitd.ac.in.dsys.meetup.messages;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-
 import com.appspot.intense_terra_821.data_api.DataApi;
 import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesSuccessMessage;
 import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesUpMeetupCreateMessage;
+import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnMakeMeetupTaskCompleted;
 
 import java.io.IOException;
-
-import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnMakeMeetupTaskCompleted;
 
 /**
  * Created by vedantdasswain on 25/03/15.
@@ -29,6 +27,7 @@ public class makeMeetupTask extends AsyncTask<Void, Void, String> {
         this.dataApi = dataApi;
         this.listener=listener;
         this.createMessage=createMessage;
+        Log.d(TAG,"createMessage:"+createMessage);
     }
 
     @Override

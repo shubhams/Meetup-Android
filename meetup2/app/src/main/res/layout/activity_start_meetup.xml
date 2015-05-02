@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
@@ -41,11 +42,45 @@
                 android:layout_marginTop="20dp" />
         </LinearLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Replace this text view with fragment for map"
-            android:id="@+id/textView" />
+        <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+                      android:id="@+id/map"
+                      android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:name="com.google.android.gms.maps.SupportMapFragment"/>
+
+
+            <LinearLayout
+                    android:id="@+id/locationMarker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="30dp"
+                    android:gravity="center"
+                    android:orientation="vertical" >
+
+                <TextView
+                        android:id="@+id/locationMarkertext"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/rounded_corner_map"
+                        android:gravity="center"
+                        android:minWidth="180dp"
+                        android:paddingLeft="2dp"
+                        android:paddingRight="2dp"
+                        android:text=" Set your Location "
+                        android:textColor="@android:color/white" />
+
+                <ImageView
+                        android:id="@+id/icon_marker"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/add_marker" />
+            </LinearLayout>
+        </FrameLayout>
 
         <ListView
             android:layout_width="wrap_content"

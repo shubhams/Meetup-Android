@@ -32,7 +32,7 @@ public class getMeetupsTask extends AsyncTask<Void, Void, ApiCustomMessagesMeetu
     protected ApiCustomMessagesMeetupListMessage doInBackground(Void... params) {
         ApiCustomMessagesMeetupListMessage meetupsList = new ApiCustomMessagesMeetupListMessage();
         try {
-            meetupsList = dataApi.getMeetups().execute();
+            meetupsList = dataApi.getMeetupsAccepted().execute();
             return meetupsList;
         } catch (IOException e) {
             Log.d(TAG, e.getMessage(), e);
@@ -43,9 +43,14 @@ public class getMeetupsTask extends AsyncTask<Void, Void, ApiCustomMessagesMeetu
 
     @Override
     protected void onPostExecute(ApiCustomMessagesMeetupListMessage meetupsList){
-        Log.v(TAG, meetupsList.toString());
-        listener.onTaskCompleted(meetupsList,true);
-        (new getUnacceptedMeetupsTask(context, dataApi,listener)).execute();
+        if(meetupsList!=null)
+        {
+            Log.v(TAG, meetupsList.toString());
+            listener.onTaskCompleted(meetupsList,true);
+            (new getUnacceptedMeetupsTask(context, dataApi,listener)).execute();
+        }
+        else
+            Log.d(TAG,"meetupsList is empty");
         return;
     }
 }
