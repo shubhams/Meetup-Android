@@ -1,5 +1,7 @@
 package iiitd.ac.in.dsys.meetup;
 
+import android.app.PendingIntent;
+
 import com.appspot.intense_terra_821.data_api.DataApi;
 import com.appspot.intense_terra_821.users_api.UsersApi;
 
@@ -9,6 +11,7 @@ import com.appspot.intense_terra_821.users_api.UsersApi;
 public class CommonUtils {
     static UsersApi usersApiInst;
     static DataApi dataApiInst;
+    static PendingIntent alarmIntent;
 
     public static UsersApi getUsersApiInst(){
         return usersApiInst;
@@ -18,6 +21,8 @@ public class CommonUtils {
         return dataApiInst;
     }
 
+    public static PendingIntent getAlarmIntent() { return alarmIntent; }
+
     public static void setUsersApiInst(UsersApi musersApiInst){
         usersApiInst=musersApiInst;
     }
@@ -25,4 +30,6 @@ public class CommonUtils {
     public static void setDataApiInst(DataApi mdataApiInst){
         dataApiInst=mdataApiInst;
     }
+
+    public static void setAlarmIntent(PendingIntent malarmIntent) {alarmIntent=malarmIntent;}
 }

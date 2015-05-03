@@ -12,20 +12,20 @@ import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesUpMeetupMes
 import java.io.IOException;
 
 import iiitd.ac.in.dsys.meetup.ObjectClasses.MeetupObject;
-import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnActivateMeetupTaskCompleted;
+import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnDeactivateMeetupTaskCompleted;
 
 /**
- * Created by vedantdasswain on 02/05/15.
+ * Created by vedantdasswain on 03/05/15.
  */
-public class activateMeetupTask extends AsyncTask<Void, Void, ApiCustomMessagesSuccessMessage> {
+public class deactivateMeetupTask extends AsyncTask<Void, Void, ApiCustomMessagesSuccessMessage> {
     Context context;
     DataApi dataApi;
     MeetupObject mo;
-    private OnActivateMeetupTaskCompleted listener;
+    private OnDeactivateMeetupTaskCompleted listener;
 
-    public final String TAG="activateMeetupTask";
+    public final String TAG="deactivateMeetupTask";
 
-    public activateMeetupTask(Context context, DataApi dataApi, MeetupObject mo, OnActivateMeetupTaskCompleted listener) {
+    public deactivateMeetupTask(Context context, DataApi dataApi, MeetupObject mo, OnDeactivateMeetupTaskCompleted listener) {
         this.context = context;
 //        this.builder = builder;
         this.dataApi = dataApi;
@@ -42,7 +42,7 @@ public class activateMeetupTask extends AsyncTask<Void, Void, ApiCustomMessagesS
         ApiCustomMessagesUpMeetupMessageOwner msgUpMeetupMsgOwner=new ApiCustomMessagesUpMeetupMessageOwner();
         msgUpMeetupMsgOwner.setMeetupName(mo.getName());
         try {
-            successMessage = dataApi.activateMeetup(msgUpMeetupMsgOwner).execute();
+            successMessage = dataApi.deactivateMeetup(msgUpMeetupMsgOwner).execute();
             return successMessage;
         }
         catch (IOException e) {
@@ -55,7 +55,7 @@ public class activateMeetupTask extends AsyncTask<Void, Void, ApiCustomMessagesS
     @Override
     protected void onPostExecute(ApiCustomMessagesSuccessMessage meetupSuccess){
         Log.v(TAG, meetupSuccess.toString());
-        listener.onActivateTaskCompleted(meetupSuccess);
+        listener.onDeactivateTaskCompleted(meetupSuccess);
         return;
     }
 }

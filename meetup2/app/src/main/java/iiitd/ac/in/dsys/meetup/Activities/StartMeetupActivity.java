@@ -38,7 +38,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.api.client.util.DateTime;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -226,17 +225,30 @@ public class StartMeetupActivity extends ActionBarActivity
         int hourOfDay=tp.getCurrentHour();
         int minute=tp.getCurrentMinute();
 
-        c.set(year,month,day,hourOfDay+1,minute);
+        Log.v(TAG,"DateTime "+day+" "+hourOfDay);
 
-        Log.v(TAG,"Calendar: "+c.toString());
+//        c.set(year,month,day,hourOfDay+1,minute);
+        c.setTimeZone(TimeZone.getDefault());
+        c.set(Calendar.YEAR,year);
+        c.set(Calendar.MONTH,month);
+        c.set(Calendar.DAY_OF_MONTH,day);
+        c.set(Calendar.HOUR_OF_DAY,hourOfDay);
+        c.set(Calendar.MINUTE,minute);
+
+        Log.v(TAG,"CalendarTime "+c.getTime());
         meetupName=ed.getText().toString();
 
-        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
-//        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+//        c.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-//        Log.v(TAG,meetupName+" on "+c.getTimeZone());
+//        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
+//        sdf.setTimeZone(TimeZone.getDefault());
+//
+//        Log.v(TAG, "FormatTime " + sdf.format(c.getTime()).toString());
 
-        timeToArrive=new DateTime(sdf.format(c.getTime()).toString());
+//        timeToArrive=new DateTime(sdf.format(c.getTime()).toString());
+
+        timeToArrive=new DateTime(c.getTime());
+
 
         Log.v(TAG,"DateTime "+timeToArrive);
 

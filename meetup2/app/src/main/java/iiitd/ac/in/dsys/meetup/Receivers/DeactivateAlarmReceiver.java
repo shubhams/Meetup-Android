@@ -18,7 +18,7 @@ public class DeactivateAlarmReceiver extends WakefulBroadcastReceiver {
         Intent service = new Intent(context, DeactivateWakefulService.class);
 
         // Start the service, keeping the device awake while it is launching.
-        Log.i("SimpleWakefulReceiver", "Starting service @ " + SystemClock.elapsedRealtime());
+        Log.i("DeactivateWakefulRcvr", "Starting service @ " + SystemClock.elapsedRealtime());
         startWakefulService(context, service);
     }
 }

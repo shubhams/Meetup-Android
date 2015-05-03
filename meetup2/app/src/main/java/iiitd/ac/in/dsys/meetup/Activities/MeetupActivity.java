@@ -1,6 +1,7 @@
 package iiitd.ac.in.dsys.meetup.Activities;
 
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -40,23 +41,25 @@ import java.util.List;
 import java.util.TimeZone;
 
 import iiitd.ac.in.dsys.meetup.CommonUtils;
-import iiitd.ac.in.dsys.meetup.Receivers.DeactivateAlarmReceiver;
 import iiitd.ac.in.dsys.meetup.ObjectClasses.MeetupObject;
 import iiitd.ac.in.dsys.meetup.R;
+import iiitd.ac.in.dsys.meetup.Receivers.DeactivateAlarmReceiver;
 import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnAcceptMeetupTaskCompleted;
 import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnActivateMeetupTaskCompleted;
+import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnDeactivateMeetupTaskCompleted;
 import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnGetMeetupDetailsTaskCompleted;
 import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnHeartBeatCompleted;
 import iiitd.ac.in.dsys.meetup.messages.acceptMeetupTask;
+import iiitd.ac.in.dsys.meetup.messages.activateMeetupTask;
+import iiitd.ac.in.dsys.meetup.messages.deactivateMeetupTask;
 import iiitd.ac.in.dsys.meetup.messages.getMeetupDetailsTask;
 import iiitd.ac.in.dsys.meetup.messages.sendHeartBeatTask;
 
 public class MeetupActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, LocationListener,OnGetMeetupDetailsTaskCompleted,
-        OnHeartBeatCompleted, OnAcceptMeetupTaskCompleted, OnActivateMeetupTaskCompleted
-{
+        GoogleApiClient.OnConnectionFailedListener, LocationListener, OnGetMeetupDetailsTaskCompleted,
+        OnHeartBeatCompleted, OnAcceptMeetupTaskCompleted, OnActivateMeetupTaskCompleted, OnDeactivateMeetupTaskCompleted {
 
-    private static final String TAG ="MeetupActivity" ;
+    private static final String TAG = "MeetupActivity";
     private DataApi dataApiInst;
     private MeetupObject mo;
 
@@ -71,10 +74,14 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
 
     private ApiCustomMessagesUpLocationMessage upLocationMessage;
 
-    TextView meetupName, owner,timeToArrive;
+    TextView meetupName, owner, timeToArrive;
     Switch switchActive;
     Button acceptBtn;
     Button startButton;
+
+    AlarmManager alarmMgr;
+    PendingIntent alarmIntent;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,77 +95,85 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
         mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                 .getMap();
         Bundle extras = getIntent().getExtras();
-        if(extras !=null) {
-            mo=new MeetupObject(extras.getString("name"),extras.getString("owner"),
-                    extras.getBoolean("active"),extras.getBoolean("accepted"));
-            dataApiInst= CommonUtils.getDataApiInst();
-            (new getMeetupDetailsTask(this, dataApiInst,mo, this)).execute();
+        if (extras != null) {
+            mo = new MeetupObject(extras.getString("name"), extras.getString("owner"),
+                    extras.getBoolean("active"), extras.getBoolean("accepted"));
+            dataApiInst = CommonUtils.getDataApiInst();
+            (new getMeetupDetailsTask(this, dataApiInst, mo, this)).execute();
         }
 
         setUI();
     }
 
-    private void setUI(){
-        meetupName=(TextView)findViewById(R.id.meetupName);
+    private void setUI() {
+        meetupName = (TextView) findViewById(R.id.meetupName);
         meetupName.setText(mo.getName());
 
-        owner=(TextView)findViewById(R.id.owner);
+        owner = (TextView) findViewById(R.id.owner);
         owner.setText(mo.getOwner());
 
-        timeToArrive=(TextView)findViewById(R.id.timeToArrive);
-        switchActive=(Switch)findViewById(R.id.switchActive);
+        timeToArrive = (TextView) findViewById(R.id.timeToArrive);
+        switchActive = (Switch) findViewById(R.id.switchActive);
         switchActive.setChecked(mo.getActive());
 
-        acceptBtn=(Button)findViewById(R.id.acceptBtn);
-        if(mo.getAccepted())
+        acceptBtn = (Button) findViewById(R.id.acceptBtn);
+        if (mo.getAccepted())
             acceptBtn.setVisibility(View.INVISIBLE);
     }
 
-    public void onAccept(View v){
-        (new acceptMeetupTask(this, dataApiInst,mo, this)).execute();
+    public void onAccept(View v) {
+        (new acceptMeetupTask(this, dataApiInst, mo, this)).execute();
     }
 
-    public void onActiveToggle(View v){
-        if(switchActive.isChecked()){
+    public void onActiveToggle(View v) {
+        SharedPreferences settings = getSharedPreferences("MeetupPreferences", 0);
+        String mEmail = settings.getString("ACCOUNT_NAME", "");
+
+        if (!switchActive.isChecked()) {
             //deactivate()
-        }
-        else{
-            SharedPreferences settings = getSharedPreferences("MeetupPreferences", 0);
-            String mEmail=settings.getString("ACCOUNT_NAME","");
-            if(mo.getOwner().equals(mEmail)){
-                //activate()
+            if (mo.getOwner().equalsIgnoreCase((mEmail)))
+                (new deactivateMeetupTask(this, dataApiInst, mo, this)).execute();
+            else {
+                switchActive.setChecked(true);
+                Toast.makeText(this, "Only owner the can deactivate the meetup", Toast.LENGTH_SHORT).show();
             }
-            else{
-                Toast.makeText(this,"Only the can activate the meetup",Toast.LENGTH_SHORT).show();
+        } else {
+
+            if (mo.getOwner().equalsIgnoreCase(mEmail)) {
+                //activate()
+                (new activateMeetupTask(this, dataApiInst, mo, this)).execute();
+            } else {
+                switchActive.setChecked(false);
+                Toast.makeText(this, "Only owner the can activate the meetup", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    private void fillUI(){
-        SimpleDateFormat df = new SimpleDateFormat("MMM dd, yyyy HH:mm");
+    private void fillUI() {
+        SimpleDateFormat df = new SimpleDateFormat("MMM dd, yyyy HH:mm aa");
+        Log.v(TAG, df.format(mo.getTimeOfArrival()).toString());
         df.setTimeZone(TimeZone.getDefault());
         timeToArrive.setText(df.format(mo.getTimeOfArrival()).toString());
     }
 
-    public void sendHeartBeat(Location myLoc)
-    {
+    public void sendHeartBeat(Location myLoc) {
         upLocationMessage = new ApiCustomMessagesUpLocationMessage();
         upLocationMessage.setMeetupOwner(mo.getOwner());
         upLocationMessage.setMeetupName(mo.getName());
         upLocationMessage.setDetails(false);    //set to True to get all location updates
         upLocationMessage.setLat(myLoc.getLatitude());
         upLocationMessage.setLon(myLoc.getLongitude());
-        dataApiInst= CommonUtils.getDataApiInst();
+        dataApiInst = CommonUtils.getDataApiInst();
         (new sendHeartBeatTask(MeetupActivity.this, dataApiInst, upLocationMessage, this)).execute();
     }
 
-    private void setUpMyMap(LatLng latLng){
-        Log.d(TAG,"setUpMyMap called");
+    private void setUpMyMap(LatLng latLng) {
+        Log.d(TAG, "setUpMyMap called");
         mMap.clear();
 //        mMap.addMarker(new MarkerOptions().position(latLng).title("Here I am").snippet("Cool Bro!").draggable(true));
         mMap.setMyLocationEnabled(true);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(18),2000,null);
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(18), 2000, null);
     }
 
     @Override
@@ -186,7 +201,7 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
     //GetMeetups Task
     @Override
     public void onTaskCompleted(ApiCustomMessagesMeetupDescMessage meetupDesc) {
-        if(meetupDesc!=null) {
+        if (meetupDesc != null) {
             Log.v(TAG, meetupDesc.getLatDestination() + ", " + meetupDesc.getLonDestination()
                     + ": " + meetupDesc.getTimeToArrive());
             mo.setLat(meetupDesc.getLatDestination());
@@ -208,8 +223,7 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
         }
     }
 
-    private void createLocationRequest()
-    {
+    private void createLocationRequest() {
         lr1 = new LocationRequest();
         lr1.setInterval(20000);
         lr1.setFastestInterval(10000);
@@ -219,7 +233,7 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
     @Override
     protected void onPause() {
         super.onPause();
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGAC,this);
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGAC, this);
     }
 
     @Override
@@ -233,15 +247,13 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
     public void onConnected(Bundle bundle) {
         Log.d("DEBUG", "onConnected reached");
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGAC);
-        if(mLastLocation!=null)
-        {
+        if (mLastLocation != null) {
             Toast.makeText(getApplicationContext(), String.valueOf(mLastLocation.getLatitude() + " " + mLastLocation.getLongitude()), Toast.LENGTH_LONG).show();
-            mLoc = new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude());
+            mLoc = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
             setUpMyMap(mLoc);
-        }
-        else
+        } else
             setUpMyMap(NewDelhi);
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGAC,lr1,this);
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGAC, lr1, this);
     }
 
     @Override
@@ -252,7 +264,7 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
     @Override
     public void onLocationChanged(Location location) {
         currentLocation = location;
-        Toast.makeText(getApplicationContext(), String.valueOf(currentLocation.getLatitude()+" "+currentLocation.getLongitude()),Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), String.valueOf(currentLocation.getLatitude() + " " + currentLocation.getLongitude()), Toast.LENGTH_LONG).show();
         sendHeartBeat(location);
     }
 
@@ -264,35 +276,85 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
     @Override
     public void onHeatBeatReceived(ApiCustomMessagesMeetupLocationsUpdateFullMessage fullMessage) {
         List<ApiCustomMessagesPeepLocationsMessage> userMeetupLocations = fullMessage.getUserMeetupLocations();
-        for(int i=0;i<userMeetupLocations.size();++i)
-        {
-            Log.d(TAG,userMeetupLocations.get(i).toString());
-            mMap.clear();
-            ApiCustomMessagesPeepLocationsMessage peepLocationsMessage = userMeetupLocations.get(i);
-            String userName = peepLocationsMessage.getName();
-            String userEmail = peepLocationsMessage.getEmail();
-            ApiCustomMessagesLocationMessage userLoc = peepLocationsMessage.getLatestLocation();
-            LatLng latLng = new LatLng(userLoc.getLat(),userLoc.getLon());
-            //Comment the line below to see your location also, as a marker on the map
-            if(!peepLocationsMessage.getEmail().equals(mo.getOwner()))
-                mMap.addMarker(new MarkerOptions().position(latLng).title(userName).snippet(userEmail));
+        if (userMeetupLocations != null)
+            for (int i = 0; i < userMeetupLocations.size(); ++i) {
+                Log.d(TAG, userMeetupLocations.get(i).toString());
+                mMap.clear();
+                ApiCustomMessagesPeepLocationsMessage peepLocationsMessage = userMeetupLocations.get(i);
+                String userName = peepLocationsMessage.getName();
+                String userEmail = peepLocationsMessage.getEmail();
+                ApiCustomMessagesLocationMessage userLoc = peepLocationsMessage.getLatestLocation();
+                LatLng latLng = new LatLng(userLoc.getLat(), userLoc.getLon());
+                //Comment the line below to see your location also, as a marker on the map
+                if (!peepLocationsMessage.getEmail().equals(mo.getOwner()))
+                    mMap.addMarker(new MarkerOptions().position(latLng).title(userName).snippet(userEmail));
+
+            }
+    }
+
+    @Override
+    public void onActivateTaskCompleted(ApiCustomMessagesSuccessMessage meetupSuccess) {
+
+        if (meetupSuccess.getStrValue().contains("cannot be activated")) {
+            switchActive.setChecked(false);
+            // 1. Instantiate an AlertDialog.Builder with its constructor
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+            // 2. Chain together various setter methods to set the dialog characteristics
+            builder.setMessage(meetupSuccess.getStrValue())
+                    .setTitle("Dayyuuum!");
+
+            // 3. Get the AlertDialog from create()
+            AlertDialog dialog = builder.create();
+
+            dialog.show();
+            mo.setActive(false);
+
+        } else if (meetupSuccess.getStrValue().contains("activated")) {
+            alarmMgr = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+            Intent i = new Intent(this, DeactivateAlarmReceiver.class);
+            i.putExtra("name", mo.getName());
+            i.putExtra("owner", mo.getOwner());
+            i.putExtra("active", mo.getActive());
+            i.putExtra("accepted", mo.getAccepted());
+
+            alarmIntent = PendingIntent.getBroadcast(this, 0, i, 0);
+
+            CommonUtils.setAlarmIntent(alarmIntent);
+
+            alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, mo.getTimeOfArrival() + AlarmManager.INTERVAL_FIFTEEN_MINUTES,
+                    AlarmManager.INTERVAL_FIFTEEN_MINUTES, alarmIntent);
+
+            Toast.makeText(this,"Activated",Toast.LENGTH_SHORT).show();
+            mo.setActive(true);
 
         }
     }
 
     @Override
-    public void onActivateTaskCompleted(ApiCustomMessagesSuccessMessage meetupSuccess) {
-        AlarmManager alarmMgr;
-        PendingIntent alarmIntent;
+    public void onDeactivateTaskCompleted(ApiCustomMessagesSuccessMessage meetupSuccess) {
+        if (meetupSuccess.getStrValue().contains("deactivated")) {
+            mo.setActive(false);
+            if (alarmMgr != null) {
+                alarmIntent = CommonUtils.getAlarmIntent();
+                alarmMgr.cancel(alarmIntent);
+                Toast.makeText(this,"Deactivated",Toast.LENGTH_SHORT).show();
+            }
+        }
+        else{
+            mo.setActive(true);
+            switchActive.setChecked(true);
+            // 1. Instantiate an AlertDialog.Builder with its constructor
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        if(meetupSuccess.getStrValue().equalsIgnoreCase("success")){
-            alarmMgr = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
-            Intent intent = new Intent(this, DeactivateAlarmReceiver.class);
-            alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+            // 2. Chain together various setter methods to set the dialog characteristics
+            builder.setMessage(meetupSuccess.getStrValue())
+                    .setTitle("Dayyuuum!");
 
-            alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, mo.getTimeOfArrival()+AlarmManager.INTERVAL_HOUR,
-                    AlarmManager.INTERVAL_FIFTEEN_MINUTES, alarmIntent);
+            // 3. Get the AlertDialog from create()
+            AlertDialog dialog = builder.create();
 
+            dialog.show();
         }
     }
 }
