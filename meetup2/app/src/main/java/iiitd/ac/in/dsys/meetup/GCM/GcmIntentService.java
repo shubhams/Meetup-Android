@@ -89,13 +89,16 @@ public class GcmIntentService extends IntentService {
                         sendNotification("Received: " + extras.toString(),"make_meetup");
                     }
                     else if(extras.getString("collapse_key").equals("meetup_accept")){
-                        sendNotification("Received: " + extras.toString(),"meetup_accept");
+                        sendNotification("Received: " + extras.toString(),"meetup_accepted");
                     }
                     else if(extras.getString("collapse_key").equals("meetup_deactivated")){
                         sendNotification("Received: " + extras.toString(),"meetup_deactivated");
                     }
                     else if(extras.getString("collapse_key").equals("meetup_activated")){
                         sendNotification("Received: " + extras.toString(),"meetup_activated");
+                    }
+                    else if(extras.getString("collapse_key").equals("pair_up")){
+                        sendNotification("Received: " + extras.toString(),"pair_up");
                     }
                     else{
                         sendNotification("Received: " + extras.toString(),"");
@@ -159,6 +162,18 @@ public class GcmIntentService extends IntentService {
 
             contentIntent = PendingIntent.getActivity(this, 2207,i, PendingIntent.FLAG_UPDATE_CURRENT);
             msg=notificationExtras.getString("meetup_name")+" has been activated";
+        }
+        else if(key.equals("pair_up")){
+            Intent i = new Intent(this,MeetupActivity.class);
+            i.putExtra("name",notificationExtras.getString("meetup_name"));
+            i.putExtra("owner",notificationExtras.getString("meetup_owner_email"));
+            i.putExtra("active",Boolean.getBoolean(notificationExtras.getString("active")));
+            i.putExtra("accepted",false);
+
+            contentIntent = PendingIntent.getActivity(this, 2208,i, PendingIntent.FLAG_UPDATE_CURRENT);
+            msg="Pair up with"+notificationExtras.getString("close_to")+
+                    " you are "+notificationExtras.getDouble("closeness")+"meters apart..."
+                    ;
         }
         else {
             contentIntent = PendingIntent.getActivity(this, 0,
