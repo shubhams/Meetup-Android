@@ -40,13 +40,14 @@ public class DbFunctions {
 
     }
 
-    public static ArrayList<LocationObject> read(Context context){
+    public static ArrayList<LocationObject> read(Context context,String meetupName){
         ArrayList<LocationObject> locations=new ArrayList<LocationObject>();
 
         DbHelper mDbHelper = new DbHelper(context);
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
-        String query = "SELECT * FROM " + DatabaseContract.LocationEntry.TABLE_NAME;
+        String query = "SELECT * FROM " + DatabaseContract.LocationEntry.TABLE_NAME+
+                " WHERE "+DatabaseContract.LocationEntry.MEETUPNAME+" = "+meetupName;
 
         Cursor c = db.rawQuery(
                 query, null);

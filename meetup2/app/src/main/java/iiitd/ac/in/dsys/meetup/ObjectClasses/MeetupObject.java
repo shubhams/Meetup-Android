@@ -27,8 +27,10 @@ public class MeetupObject {
                     this.owner.equals(mo.getOwner()) &&
                     this.lat==mo.getLat() &&
                     this.lon==mo.getLon() &&
-                    this.timeOfArrival== mo.getTimeOfArrival() &&
-                    this.isActive==mo.getActive()) {
+                    this.timeOfArrival== mo.getTimeOfArrival()
+//                    &&
+//                    this.isActive==mo.getActive()
+                    ) {
                 return true;
             }
         }

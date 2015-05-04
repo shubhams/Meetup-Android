@@ -410,6 +410,7 @@ public class MainActivity extends ActionBarActivity implements OnContactsTaskCom
     @Override
     public void onTaskCompleted(String reply) {
         if(reply.equals("Success")) {
+            setAccountEmail(accountEmail);
             Intent i = new Intent(MainActivity.this, HomeActivity.class);
             startActivity(i);
             // close this activity

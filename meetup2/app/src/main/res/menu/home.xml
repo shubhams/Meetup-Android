@@ -5,4 +5,7 @@
     <item android:id="@+id/action_new_meetup" android:title="@string/action_new_meetup"
         android:icon="@drawable/ic_action_new_meetup"
         app:showAsAction="withText|ifRoom" />
+    <item android:id="@+id/action_refresh_contacts" android:title="@string/action_refresh_contacts"
+        android:icon="@drawable/ic_action_refresh_contacts"
+        app:showAsAction="withText|ifRoom" />
 </menu>

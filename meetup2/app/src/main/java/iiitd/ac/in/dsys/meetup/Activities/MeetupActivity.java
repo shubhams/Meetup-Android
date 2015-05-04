@@ -100,6 +100,7 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
             mo = new MeetupObject(extras.getString("name"), extras.getString("owner"),
                     extras.getBoolean("active"), extras.getBoolean("accepted"));
             dataApiInst = CommonUtils.getDataApiInst();
+            Log.v(TAG,"Getting Details for: "+mo.getName()+" "+mo.getOwner());
             (new getMeetupDetailsTask(this, dataApiInst, mo, this)).execute();
         }
 
@@ -136,7 +137,7 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
                 (new deactivateMeetupTask(this, dataApiInst, mo, this)).execute();
             else {
                 switchActive.setChecked(true);
-                Toast.makeText(this, "Only owner the can deactivate the meetup", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Only owner can deactivate the meetup", Toast.LENGTH_SHORT).show();
             }
         } else {
 
@@ -145,7 +146,7 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
                 (new activateMeetupTask(this, dataApiInst, mo, this)).execute();
             } else {
                 switchActive.setChecked(false);
-                Toast.makeText(this, "Only owner the can activate the meetup", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Only owner can activate the meetup", Toast.LENGTH_SHORT).show();
             }
         }
     }
