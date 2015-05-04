@@ -282,6 +282,7 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
                         .snippet(String.valueOf(lo.getTime())));
             }
         }
+        Log.v(TAG,"Plotted markers");
 
         renderPolylines();
 //        createLocationRequest();
@@ -420,10 +421,12 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
             userPaths.put(lo.getUsername(),value);
         }
 
-        plotMap();
+        plotLines();
     }
 
-    private void plotMap(){
+    private void plotLines(){
+        Log.v(TAG,"plotLines");
+
         int[] colours= {
                 Color.rgb(13, 77, 77),
                 Color.rgb(128, 21, 21),

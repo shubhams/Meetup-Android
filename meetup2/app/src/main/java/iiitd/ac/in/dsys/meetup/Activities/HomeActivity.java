@@ -78,7 +78,7 @@ public class HomeActivity extends ActionBarActivity
     @Override
     protected void onStop() {
         super.onStop();
-        stopService(serviceIntent);
+//        stopService(serviceIntent);
     }
 
     public void onSectionAttached(int number) {
