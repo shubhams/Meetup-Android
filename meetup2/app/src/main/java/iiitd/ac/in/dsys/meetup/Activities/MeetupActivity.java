@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import iiitd.ac.in.dsys.meetup.CommonUtils;
+import iiitd.ac.in.dsys.meetup.ObjectClasses.MeetupAlarmIntent;
 import iiitd.ac.in.dsys.meetup.ObjectClasses.MeetupObject;
 import iiitd.ac.in.dsys.meetup.R;
 import iiitd.ac.in.dsys.meetup.Receivers.DeactivateAlarmReceiver;
@@ -318,9 +319,10 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
             i.putExtra("active", mo.getActive());
             i.putExtra("accepted", mo.getAccepted());
 
-            alarmIntent = PendingIntent.getBroadcast(this, 0, i, 0);
+            int index=CommonUtils.getNextIndexOfAlarmIntents();
+            alarmIntent = PendingIntent.getBroadcast(this, index, i, 0);
 
-            CommonUtils.setAlarmIntent(alarmIntent);
+            CommonUtils.setAlarmIntentToList(new MeetupAlarmIntent(mo.getName(),alarmIntent));
 
             alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, mo.getTimeOfArrival() + AlarmManager.INTERVAL_FIFTEEN_MINUTES,
                     AlarmManager.INTERVAL_FIFTEEN_MINUTES, alarmIntent);
@@ -337,6 +339,7 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
             mo.setActive(false);
             if (alarmMgr != null) {
                 alarmIntent = CommonUtils.getAlarmIntent();
+                alarmIntent=CommonUtils.getAlarmIntentByName(mo.getName());
                 alarmMgr.cancel(alarmIntent);
                 Toast.makeText(this,"Deactivated",Toast.LENGTH_SHORT).show();
             }

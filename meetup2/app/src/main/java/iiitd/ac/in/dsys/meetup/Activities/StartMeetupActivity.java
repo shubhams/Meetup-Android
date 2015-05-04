@@ -1,6 +1,11 @@
 package iiitd.ac.in.dsys.meetup.Activities;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
@@ -45,7 +50,10 @@ import java.util.TimeZone;
 import iiitd.ac.in.dsys.meetup.CommonUtils;
 import iiitd.ac.in.dsys.meetup.CustomUI.ContactsListAdapter;
 import iiitd.ac.in.dsys.meetup.ObjectClasses.ContactObject;
+import iiitd.ac.in.dsys.meetup.ObjectClasses.MeetupAlarmIntent;
+import iiitd.ac.in.dsys.meetup.ObjectClasses.MeetupObject;
 import iiitd.ac.in.dsys.meetup.R;
+import iiitd.ac.in.dsys.meetup.Receivers.DeactivateAlarmReceiver;
 import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnContactsTaskCompleted;
 import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnMakeMeetupTaskCompleted;
 import iiitd.ac.in.dsys.meetup.messages.contactsTask;
@@ -329,8 +337,16 @@ public class StartMeetupActivity extends ActionBarActivity
         progressDialog.cancel();
         Log.v(TAG,"Meetup creation: "+message);
         Toast.makeText(this,"Meetup creation: "+message,Toast.LENGTH_SHORT).show();
-        if(message.equals("Success"))
-            finish();
+        if(message.equals("Success")) {
+            long currTime=System.currentTimeMillis();
+            long timeDiffHours=(timeToArrive.getValue()-currTime)/1000/60;
+            if(timeDiffHours<180){
+                setAlarm();
+            }
+            else{
+                finish();
+            }
+        }
     }
 
     @Override
@@ -360,4 +376,31 @@ public class StartMeetupActivity extends ActionBarActivity
 
         Log.d(TAG,"onConnectionFailed called");
     }
+
+    public void setAlarm(){
+        SharedPreferences settings = getSharedPreferences("MeetupPreferences", 0);
+        String mEmail = settings.getString("ACCOUNT_NAME", "");
+        MeetupObject mo=new MeetupObject(meetupName,mEmail,true,true);
+
+        AlarmManager alarmMgr = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        Intent i = new Intent(this, DeactivateAlarmReceiver.class);
+        i.putExtra("name", mo.getName());
+        i.putExtra("owner", mo.getOwner());
+        i.putExtra("active", mo.getActive());
+        i.putExtra("accepted", mo.getAccepted());
+
+        int index=CommonUtils.getNextIndexOfAlarmIntents();
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(this, index, i, 0);
+
+        CommonUtils.setAlarmIntentToList(new MeetupAlarmIntent(mo.getName(),alarmIntent));
+
+        alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, mo.getTimeOfArrival() + AlarmManager.INTERVAL_FIFTEEN_MINUTES,
+                AlarmManager.INTERVAL_FIFTEEN_MINUTES, alarmIntent);
+
+        Toast.makeText(this,"Activated",Toast.LENGTH_SHORT).show();
+        mo.setActive(true);
+
+        finish();
+    }
+
 }

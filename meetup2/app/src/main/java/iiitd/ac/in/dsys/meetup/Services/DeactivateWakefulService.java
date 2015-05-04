@@ -59,7 +59,7 @@ public class DeactivateWakefulService extends IntentService implements OnDeactiv
             PendingIntent alarmIntent;
             mo.setActive(false);
             if (alarmMgr != null) {
-                alarmIntent = CommonUtils.getAlarmIntent();
+                alarmIntent = CommonUtils.getAlarmIntentByName(mo.getName());
                 alarmMgr.cancel(alarmIntent);
                 Toast.makeText(this, "Deactivated", Toast.LENGTH_SHORT).show();
             }
