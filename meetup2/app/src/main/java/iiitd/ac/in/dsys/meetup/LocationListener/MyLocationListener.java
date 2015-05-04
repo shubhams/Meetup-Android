@@ -85,7 +85,7 @@ public class MyLocationListener implements LocationListener, OnHeartBeatComplete
 
     void filterActiveMeetups(){
         for(MeetupObject mo:meetupObjectsList){
-            if (!mo.getActive())
+            if (!mo.getActive() || !(mo.getAccepted()))
                 meetupObjectsList.remove(mo);
         }
     }

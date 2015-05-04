@@ -13,19 +13,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.Switch;
-import android.widget.TextView;
-import android.widget.Toast;
-
+import android.widget.*;
 import com.appspot.intense_terra_821.data_api.DataApi;
-import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesLocationMessage;
-import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesMeetupDescMessage;
-import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesMeetupLocationsUpdateFullMessage;
-import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesPeepLocationsMessage;
-import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesSuccessMessage;
-import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesUpLocationMessage;
+import com.appspot.intense_terra_821.data_api.model.*;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -34,12 +24,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-
-import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.TimeZone;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 import iiitd.ac.in.dsys.meetup.CommonUtils;
 import iiitd.ac.in.dsys.meetup.Database.DbFunctions;
 import iiitd.ac.in.dsys.meetup.ObjectClasses.LocationObject;
@@ -47,16 +31,13 @@ import iiitd.ac.in.dsys.meetup.ObjectClasses.MeetupAlarmIntent;
 import iiitd.ac.in.dsys.meetup.ObjectClasses.MeetupObject;
 import iiitd.ac.in.dsys.meetup.R;
 import iiitd.ac.in.dsys.meetup.Receivers.DeactivateAlarmReceiver;
-import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnAcceptMeetupTaskCompleted;
-import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnActivateMeetupTaskCompleted;
-import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnDeactivateMeetupTaskCompleted;
-import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnGetMeetupDetailsTaskCompleted;
-import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnHeartBeatCompleted;
-import iiitd.ac.in.dsys.meetup.messages.acceptMeetupTask;
-import iiitd.ac.in.dsys.meetup.messages.activateMeetupTask;
-import iiitd.ac.in.dsys.meetup.messages.deactivateMeetupTask;
-import iiitd.ac.in.dsys.meetup.messages.getMeetupDetailsTask;
-import iiitd.ac.in.dsys.meetup.messages.sendHeartBeatTask;
+import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.*;
+import iiitd.ac.in.dsys.meetup.messages.*;
+
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.TimeZone;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetailsTaskCompleted,
         OnHeartBeatCompleted, OnAcceptMeetupTaskCompleted, OnActivateMeetupTaskCompleted,
@@ -266,16 +247,14 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "onResume called");
+        mMap.clear();
         mGAC.connect();
         locationObjectList = DbFunctions.read(MeetupActivity.this, mo.getName());
         for(LocationObject lo : locationObjectList)
         {
-            if(!(lo.getUsername().equals(userEmail)))
-            {
-                LatLng latLng = new LatLng(lo.getLat(), lo.getLon());
-                mMap.addMarker(new MarkerOptions().position(latLng).title(lo.getUsername())
-                        .snippet(String.valueOf(lo.getTime())));
-            }
+            LatLng latLng = new LatLng(lo.getLat(), lo.getLon());
+            mMap.addMarker(new MarkerOptions().position(latLng).title(lo.getUsername())
+                    .snippet(String.valueOf(lo.getTime())));
         }
 //        createLocationRequest();
     }
