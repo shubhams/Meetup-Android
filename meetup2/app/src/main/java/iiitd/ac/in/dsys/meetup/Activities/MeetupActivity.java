@@ -6,7 +6,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -23,17 +25,10 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
-
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
-import java.util.TimeZone;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 import iiitd.ac.in.dsys.meetup.CommonUtils;
 import iiitd.ac.in.dsys.meetup.Database.DbFunctions;
 import iiitd.ac.in.dsys.meetup.ObjectClasses.LocationObject;
@@ -45,7 +40,9 @@ import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.*;
 import iiitd.ac.in.dsys.meetup.messages.*;
 
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.TimeZone;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -79,6 +76,8 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
     PendingIntent alarmIntent;
     SharedPreferences settings;
     HashMap<String,PolylineOptions> userPaths;
+    BitmapDrawable bitmapDrawable;
+    Bitmap markerIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,8 +102,9 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
         settings = getSharedPreferences("MeetupPreferences", 0);
         SharedPreferences settings = getSharedPreferences("MeetupPreferences", 0);
         userEmail = settings.getString("ACCOUNT_NAME", "");
-//        serviceIntent = new Intent(this, HeartBeatService.class);
-//        startService(serviceIntent);
+        bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.peep_marker);
+        markerIcon = bitmapDrawable.getBitmap();
+        markerIcon = Bitmap.createScaledBitmap(markerIcon,50,50,false);
         setUI();
     }
 
@@ -172,17 +172,6 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
         Log.v(TAG, df.format(mo.getTimeOfArrival()).toString());
         df.setTimeZone(TimeZone.getDefault());
         timeToArrive.setText(df.format(mo.getTimeOfArrival()).toString());
-    }
-
-    public void sendHeartBeat(Location myLoc) {
-        upLocationMessage = new ApiCustomMessagesUpLocationMessage();
-        upLocationMessage.setMeetupOwner(mo.getOwner());
-        upLocationMessage.setMeetupName(mo.getName());
-        upLocationMessage.setDetails(false);    //set to True to get all location updates
-        upLocationMessage.setLat(myLoc.getLatitude());
-        upLocationMessage.setLon(myLoc.getLongitude());
-        dataApiInst = CommonUtils.getDataApiInst();
-        (new sendHeartBeatTask(MeetupActivity.this, dataApiInst, upLocationMessage, this)).execute();
     }
 
     private void setUpMyMap(LatLng latLng) {
@@ -262,8 +251,10 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
         locationObjectList = DbFunctions.read(MeetupActivity.this, mo.getName());
         for(LocationObject lo : locationObjectList)
         {
+            
             LatLng latLng = new LatLng(lo.getLat(), lo.getLon());
             mMap.addMarker(new MarkerOptions().position(latLng).title(lo.getUsername())
+                    .icon(BitmapDescriptorFactory.fromBitmap(markerIcon))
                     .snippet(String.valueOf(lo.getTime())));
         }
 

@@ -199,7 +199,7 @@ public class StartMeetupActivity extends ActionBarActivity
                 Log.d(TAG, "Location coordinates:"+String.valueOf(center.latitude+" "+center.longitude));
                         Marker m = googleMap.addMarker(new MarkerOptions()
                         .position(meetUpLocation)
-                        .title(" Set your Location ")
+                        .title(" Set Meetup Location ")
                         .snippet("")
                         .icon(BitmapDescriptorFactory
                                 .fromBitmap(bitmap)));
