@@ -14,11 +14,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.appspot.intense_terra_821.data_api.DataApi;
-import com.appspot.intense_terra_821.data_api.model.*;
+import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesLocationMessage;
+import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesMeetupDescMessage;
+import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesMeetupLocationsUpdateFullMessage;
+import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesPeepLocationsMessage;
+import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesSuccessMessage;
+import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesUpLocationMessage;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -27,17 +34,26 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.TimeZone;
+
 import iiitd.ac.in.dsys.meetup.CommonUtils;
 import iiitd.ac.in.dsys.meetup.ObjectClasses.MeetupAlarmIntent;
 import iiitd.ac.in.dsys.meetup.ObjectClasses.MeetupObject;
 import iiitd.ac.in.dsys.meetup.R;
 import iiitd.ac.in.dsys.meetup.Receivers.DeactivateAlarmReceiver;
-import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.*;
-import iiitd.ac.in.dsys.meetup.messages.*;
-
-import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.TimeZone;
+import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnAcceptMeetupTaskCompleted;
+import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnActivateMeetupTaskCompleted;
+import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnDeactivateMeetupTaskCompleted;
+import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnGetMeetupDetailsTaskCompleted;
+import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnHeartBeatCompleted;
+import iiitd.ac.in.dsys.meetup.messages.acceptMeetupTask;
+import iiitd.ac.in.dsys.meetup.messages.activateMeetupTask;
+import iiitd.ac.in.dsys.meetup.messages.deactivateMeetupTask;
+import iiitd.ac.in.dsys.meetup.messages.getMeetupDetailsTask;
+import iiitd.ac.in.dsys.meetup.messages.sendHeartBeatTask;
 
 public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetailsTaskCompleted,
         OnHeartBeatCompleted, OnAcceptMeetupTaskCompleted, OnActivateMeetupTaskCompleted,
@@ -101,6 +117,19 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
         timeToArrive = (TextView) findViewById(R.id.timeToArrive);
         switchActive = (Switch) findViewById(R.id.switchActive);
         switchActive.setChecked(mo.getActive());
+
+        switchActive.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                SharedPreferences settings = getSharedPreferences("MeetupPreferences", 0);
+                String mEmail = settings.getString("ACCOUNT_NAME", "");
+
+                if(!mo.getOwner().equals(mEmail)){
+                    Toast.makeText(MeetupActivity.this,"Only owner can do this",Toast.LENGTH_SHORT).show();
+                    switchActive.setChecked(!isChecked);
+                }
+            }
+        });
 
         acceptBtn = (Button) findViewById(R.id.acceptBtn);
         if (mo.getAccepted())
