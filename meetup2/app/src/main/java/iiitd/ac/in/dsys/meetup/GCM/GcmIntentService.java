@@ -88,6 +88,15 @@ public class GcmIntentService extends IntentService {
                     if(extras.getString("collapse_key").equals("make_meetup")) {
                         sendNotification("Received: " + extras.toString(),"make_meetup");
                     }
+                    else if(extras.getString("collapse_key").equals("meetup_accept")){
+                        sendNotification("Received: " + extras.toString(),"meetup_accept");
+                    }
+                    else if(extras.getString("collapse_key").equals("meetup_deactivated")){
+                        sendNotification("Received: " + extras.toString(),"meetup_deactivated");
+                    }
+                    else if(extras.getString("collapse_key").equals("meetup_activated")){
+                        sendNotification("Received: " + extras.toString(),"meetup_activated");
+                    }
                     else{
                         sendNotification("Received: " + extras.toString(),"");
                     }
@@ -119,6 +128,37 @@ public class GcmIntentService extends IntentService {
             contentIntent = PendingIntent.getActivity(this, 2204,i, PendingIntent.FLAG_UPDATE_CURRENT);
             msg=notificationExtras.getString("meetup_owner_email")+" invited you to join "
                     +notificationExtras.getString("meetup_name");
+        }
+        else if(key.equals("meetup_accepted")){
+            Intent i = new Intent(this,MeetupActivity.class);
+            i.putExtra("name",notificationExtras.getString("meetup_name"));
+            i.putExtra("owner",notificationExtras.getString("meetup_owner_email"));
+            i.putExtra("active",Boolean.getBoolean(notificationExtras.getString("active")));
+            i.putExtra("accepted",false);
+
+            contentIntent = PendingIntent.getActivity(this, 2205,i, PendingIntent.FLAG_UPDATE_CURRENT);
+            msg=notificationExtras.getString("acceptor_email")+" joined "
+                    +notificationExtras.getString("meetup_name");
+        }
+        else if(key.equals("meetup_deactivated")){
+            Intent i = new Intent(this,MeetupActivity.class);
+            i.putExtra("name",notificationExtras.getString("meetup_name"));
+            i.putExtra("owner",notificationExtras.getString("meetup_owner_email"));
+            i.putExtra("active",Boolean.getBoolean(notificationExtras.getString("active")));
+            i.putExtra("accepted",false);
+
+            contentIntent = PendingIntent.getActivity(this, 2206,i, PendingIntent.FLAG_UPDATE_CURRENT);
+            msg=notificationExtras.getString("meetup_name")+" has been deactivated";
+        }
+        else if(key.equals("meetup_activated")){
+            Intent i = new Intent(this,MeetupActivity.class);
+            i.putExtra("name",notificationExtras.getString("meetup_name"));
+            i.putExtra("owner",notificationExtras.getString("meetup_owner_email"));
+            i.putExtra("active",Boolean.getBoolean(notificationExtras.getString("active")));
+            i.putExtra("accepted",false);
+
+            contentIntent = PendingIntent.getActivity(this, 2207,i, PendingIntent.FLAG_UPDATE_CURRENT);
+            msg=notificationExtras.getString("meetup_name")+" has been activated";
         }
         else {
             contentIntent = PendingIntent.getActivity(this, 0,

@@ -61,6 +61,8 @@ public class DbFunctions {
             }
         }
 
+        db.close();
+
         return locations;
     }
 
