@@ -29,14 +29,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.*;
 import com.google.api.client.util.DateTime;
-<<<<<<< HEAD
-=======
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.TimeZone;
-
->>>>>>> 14779ab7176d93de73dc3cc051fa540bc1fbc17e
 import iiitd.ac.in.dsys.meetup.CommonUtils;
 import iiitd.ac.in.dsys.meetup.CustomUI.ContactsListAdapter;
 import iiitd.ac.in.dsys.meetup.ObjectClasses.ContactObject;
@@ -49,7 +41,6 @@ import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnMakeMeetupTaskCompleted;
 import iiitd.ac.in.dsys.meetup.messages.contactsTask;
 import iiitd.ac.in.dsys.meetup.messages.makeMeetupTask;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
