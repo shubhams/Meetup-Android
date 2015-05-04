@@ -13,19 +13,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.Switch;
-import android.widget.TextView;
-import android.widget.Toast;
-
+import android.widget.*;
 import com.appspot.intense_terra_821.data_api.DataApi;
-import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesLocationMessage;
-import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesMeetupDescMessage;
-import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesMeetupLocationsUpdateFullMessage;
-import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesPeepLocationsMessage;
-import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesSuccessMessage;
-import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesUpLocationMessage;
+import com.appspot.intense_terra_821.data_api.model.*;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -34,26 +24,20 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-
-import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.TimeZone;
-
 import iiitd.ac.in.dsys.meetup.CommonUtils;
+import iiitd.ac.in.dsys.meetup.Database.DbFunctions;
+import iiitd.ac.in.dsys.meetup.ObjectClasses.LocationObject;
 import iiitd.ac.in.dsys.meetup.ObjectClasses.MeetupAlarmIntent;
 import iiitd.ac.in.dsys.meetup.ObjectClasses.MeetupObject;
 import iiitd.ac.in.dsys.meetup.R;
 import iiitd.ac.in.dsys.meetup.Receivers.DeactivateAlarmReceiver;
-import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnAcceptMeetupTaskCompleted;
-import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnActivateMeetupTaskCompleted;
-import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnDeactivateMeetupTaskCompleted;
-import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnGetMeetupDetailsTaskCompleted;
-import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnHeartBeatCompleted;
-import iiitd.ac.in.dsys.meetup.messages.acceptMeetupTask;
-import iiitd.ac.in.dsys.meetup.messages.activateMeetupTask;
-import iiitd.ac.in.dsys.meetup.messages.deactivateMeetupTask;
-import iiitd.ac.in.dsys.meetup.messages.getMeetupDetailsTask;
-import iiitd.ac.in.dsys.meetup.messages.sendHeartBeatTask;
+import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.*;
+import iiitd.ac.in.dsys.meetup.messages.*;
+
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.TimeZone;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetailsTaskCompleted,
         OnHeartBeatCompleted, OnAcceptMeetupTaskCompleted, OnActivateMeetupTaskCompleted,
@@ -63,6 +47,7 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
     private static final String TAG = "MeetupActivity";
     private DataApi dataApiInst;
     private MeetupObject mo;
+    private List<LocationObject> locationObjectList = new CopyOnWriteArrayList<>();
 
     GoogleApiClient mGAC;
     LatLng mLoc;
@@ -70,6 +55,7 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
     Location mLastLocation;
 //    LocationRequest lr1;
     public static GoogleMap mMap;
+    private String userEmail;
 
     static final LatLng NewDelhi = new LatLng(28.6139, 77.2089);
 
@@ -81,6 +67,7 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
     Button startButton;
     AlarmManager alarmMgr;
     PendingIntent alarmIntent;
+    SharedPreferences settings;
 
 
     @Override
@@ -102,10 +89,16 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
             Log.v(TAG,"Getting Details for: "+mo.getName()+" "+mo.getOwner());
             (new getMeetupDetailsTask(this, dataApiInst, mo, this)).execute();
         }
+
+        settings = getSharedPreferences("MeetupPreferences", 0);
+        SharedPreferences settings = getSharedPreferences("MeetupPreferences", 0);
+        userEmail = settings.getString("ACCOUNT_NAME", "");
 //        serviceIntent = new Intent(this, HeartBeatService.class);
 //        startService(serviceIntent);
         setUI();
     }
+
+    
 
     private void setUI() {
         meetupName = (TextView) findViewById(R.id.meetupName);
@@ -124,8 +117,8 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
                 SharedPreferences settings = getSharedPreferences("MeetupPreferences", 0);
                 String mEmail = settings.getString("ACCOUNT_NAME", "");
 
-                if(!mo.getOwner().equals(mEmail)){
-                    Toast.makeText(MeetupActivity.this,"Only owner can do this",Toast.LENGTH_SHORT).show();
+                if (!mo.getOwner().equals(mEmail)) {
+                    Toast.makeText(MeetupActivity.this, "Only owner can do this", Toast.LENGTH_SHORT).show();
                     switchActive.setChecked(!isChecked);
                 }
             }
@@ -238,12 +231,11 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
         }
     }
 
-//    private void createLocationRequest() {
-//        lr1 = new LocationRequest();
-//        lr1.setInterval(30000);
-//        lr1.setFastestInterval(30000);
-//        lr1.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-//    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mMap.clear();
+    }
 
     @Override
     protected void onPause() {
@@ -254,7 +246,18 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d(TAG, "onResume called");
         mGAC.connect();
+        locationObjectList = DbFunctions.read(MeetupActivity.this, mo.getName());
+        for(LocationObject lo : locationObjectList)
+        {
+            if(!(lo.getUsername().equals(userEmail)))
+            {
+                LatLng latLng = new LatLng(lo.getLat(), lo.getLon());
+                mMap.addMarker(new MarkerOptions().position(latLng).title(lo.getUsername())
+                        .snippet(String.valueOf(lo.getTime())));
+            }
+        }
 //        createLocationRequest();
     }
 
