@@ -66,8 +66,6 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
 
     static final LatLng NewDelhi = new LatLng(28.6139, 77.2089);
 
-    private ApiCustomMessagesUpLocationMessage upLocationMessage;
-
     TextView meetupName, owner, timeToArrive;
     Switch switchActive;
     Button acceptBtn;
@@ -169,7 +167,7 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
     }
 
     private void fillUI() {
-        SimpleDateFormat df = new SimpleDateFormat("MMM dd, yyyy HH:mm aa");
+        SimpleDateFormat df = new SimpleDateFormat("MMM dd, yyyy hh:mm aa");
         Log.v(TAG, df.format(mo.getTimeOfArrival()).toString());
         df.setTimeZone(TimeZone.getDefault());
         timeToArrive.setText(df.format(mo.getTimeOfArrival()).toString());
@@ -216,6 +214,8 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
             meetupLatLng = new LatLng(meetupDesc.getLatDestination(),meetupDesc.getLonDestination());
             mMap.addMarker(new MarkerOptions().position(meetupLatLng).
                     title("Meetup Destination"));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(meetupLatLng));
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(16));
             mo.setTimeOfArrival(meetupDesc.getTimeToArrive().getValue());
             fillUI();
         }
@@ -290,19 +290,6 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
     public void onConnectionSuspended(int i) {
         Log.d("DEBUG", "onConnectedSuspended reached");
     }
-
-//    @Override
-//    public void onLocationChanged(Location location) {
-//        if(location!=null)
-//        {
-//            currentLocation = location;
-//            Toast.makeText(getApplicationContext(), String.valueOf(currentLocation.getLatitude() + " " + currentLocation.getLongitude()), Toast.LENGTH_LONG).show();
-//            sendHeartBeat(currentLocation);
-//
-//        }
-//        else
-//            Log.d(TAG,"location object found as null");
-//    }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
