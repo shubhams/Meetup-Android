@@ -4,10 +4,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import iiitd.ac.in.dsys.meetup.ObjectClasses.LocationObject;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import iiitd.ac.in.dsys.meetup.ObjectClasses.LocationObject;
 
 /**
  * Created by vedantdasswain on 04/05/15.
@@ -61,7 +62,7 @@ public class DbFunctions {
             }
         }
         db.close();
-        
+
         return locations;
     }
 
