@@ -78,6 +78,7 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
     HashMap<String,PolylineOptions> userPaths;
     BitmapDrawable bitmapDrawable;
     Bitmap markerIcon;
+    LatLng meetupLatLng;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,10 +178,9 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
     private void setUpMyMap(LatLng latLng) {
         Log.d(TAG, "setUpMyMap called");
 //        mMap.clear();
-//        mMap.addMarker(new MarkerOptions().position(latLng).title("Here I am").snippet("Cool Bro!").draggable(true));
         mMap.setMyLocationEnabled(true);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(18), 2000, null);
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(16), 2000, null);
     }
 
     @Override
@@ -213,6 +213,9 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
                     + ": " + meetupDesc.getTimeToArrive());
             mo.setLat(meetupDesc.getLatDestination());
             mo.setLon(meetupDesc.getLonDestination());
+            meetupLatLng = new LatLng(meetupDesc.getLatDestination(),meetupDesc.getLonDestination());
+            mMap.addMarker(new MarkerOptions().position(meetupLatLng).
+                    title("Meetup Destination"));
             mo.setTimeOfArrival(meetupDesc.getTimeToArrive().getValue());
             fillUI();
         }
@@ -247,14 +250,17 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
         super.onResume();
         Log.d(TAG, "onResume called");
         mMap.clear();
+        Log.d(TAG,"locationObject coordinates:"+mo.getLat()+","+mo.getLon());
         locationObjectList = DbFunctions.read(MeetupActivity.this, mo.getName());
         for(LocationObject lo : locationObjectList)
         {
-            
+            SimpleDateFormat df = new SimpleDateFormat("MMM dd, yyyy hh:mm aa");
+            df.setTimeZone(TimeZone.getDefault());
+            String formattedDate = df.format(lo.getTime()).toString();
             LatLng latLng = new LatLng(lo.getLat(), lo.getLon());
             mMap.addMarker(new MarkerOptions().position(latLng).title(lo.getUsername())
                     .icon(BitmapDescriptorFactory.fromBitmap(markerIcon))
-                    .snippet(String.valueOf(lo.getTime())));
+                    .snippet((formattedDate)));
         }
         Log.v(TAG,"Plotted markers");
 
