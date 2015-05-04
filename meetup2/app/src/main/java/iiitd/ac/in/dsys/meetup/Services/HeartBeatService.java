@@ -17,7 +17,8 @@ import iiitd.ac.in.dsys.meetup.LocationListener.MyLocationListener;
  * Created by Shubham on 02 May 15.
  */
 public class HeartBeatService extends Service implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener{
+        GoogleApiClient.OnConnectionFailedListener
+{
 
     private static String TAG;
     private MyLocationListener locationListener;
