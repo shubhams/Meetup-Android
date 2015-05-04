@@ -4,10 +4,20 @@ import android.content.Context;
 import android.location.Location;
 import android.util.Log;
 import android.widget.Toast;
+
 import com.appspot.intense_terra_821.data_api.DataApi;
-import com.appspot.intense_terra_821.data_api.model.*;
+import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesLocationMessage;
+import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesMeetupListMessage;
+import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesMeetupLocationsUpdateFullMessage;
+import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesMeetupMessage;
+import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesPeepLocationsMessage;
+import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesUpLocationMessage;
 import com.google.android.gms.location.LocationListener;
 import com.google.api.client.util.DateTime;
+
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import iiitd.ac.in.dsys.meetup.CommonUtils;
 import iiitd.ac.in.dsys.meetup.Database.DbFunctions;
 import iiitd.ac.in.dsys.meetup.ObjectClasses.LocationObject;
@@ -16,9 +26,6 @@ import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnGetMeetupsTaskCompleted;
 import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnHeartBeatCompleted;
 import iiitd.ac.in.dsys.meetup.messages.getMeetupsTask;
 import iiitd.ac.in.dsys.meetup.messages.sendHeartBeatTask;
-
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by Shubham on 02 May 15.

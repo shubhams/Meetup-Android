@@ -140,7 +140,7 @@ public class GcmIntentService extends IntentService {
             msg=notificationExtras.getString("acceptor_email")+" joined "
                     +notificationExtras.getString("meetup_name");
         }
-        else if(key.equals("meetup_deactivated")){
+        else if(key.contains("meetup_deactivated")){
             Intent i = new Intent(this,MeetupActivity.class);
             i.putExtra("name",notificationExtras.getString("meetup_name"));
             i.putExtra("owner",notificationExtras.getString("meetup_owner_email"));

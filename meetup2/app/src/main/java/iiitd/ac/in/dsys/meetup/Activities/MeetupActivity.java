@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -24,6 +25,15 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
+
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
+import java.util.TimeZone;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import iiitd.ac.in.dsys.meetup.CommonUtils;
 import iiitd.ac.in.dsys.meetup.Database.DbFunctions;
 import iiitd.ac.in.dsys.meetup.ObjectClasses.LocationObject;
@@ -68,7 +78,7 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
     AlarmManager alarmMgr;
     PendingIntent alarmIntent;
     SharedPreferences settings;
-
+    HashMap<String,PolylineOptions> userPaths;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -256,6 +266,8 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
             mMap.addMarker(new MarkerOptions().position(latLng).title(lo.getUsername())
                     .snippet(String.valueOf(lo.getTime())));
         }
+
+        renderPolylines();
 //        createLocationRequest();
     }
 
@@ -380,5 +392,40 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
             dialog.show();
         }
     }
+
+    private void renderPolylines(){
+        userPaths=new HashMap<String,PolylineOptions>();
+        for(LocationObject lo : locationObjectList)
+        {
+            PolylineOptions value=userPaths.get(lo.getUsername());
+            if(value==null)
+                value=new PolylineOptions();
+            value.add(new LatLng(lo.getLat(),lo.getLon()));
+            userPaths.put(lo.getUsername(),value);
+        }
+
+        plotMap();
+    }
+
+    private void plotMap(){
+        int[] colours= {
+                Color.rgb(13, 77, 77),
+                Color.rgb(128, 21, 21),
+                Color.rgb(85, 38, 0),
+                Color.rgb(73, 109, 137),
+                Color.rgb(64, 127, 127),
+                Color.rgb(17, 102, 17),
+                Color.rgb(212, 106, 106),
+                Color.rgb(85, 170, 85),
+                Color.rgb(212, 154, 106),
+                Color.rgb(18, 54, 82),
+        };
+        Random random=new Random();
+            for(PolylineOptions value:userPaths.values()) {
+                value.color(colours[random.nextInt(10)]);
+                mMap.addPolyline(value);
+            }
+        }
+
 }
 
