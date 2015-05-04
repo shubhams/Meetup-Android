@@ -60,8 +60,7 @@
                     android:layout_alignBottom="@+id/meetupName"
                     android:layout_alignParentRight="true"
                     android:layout_alignParentEnd="true"
-                    android:clickable="false"
-                    android:focusable="false"/>
+                android:onClick="onActiveToggle" />
 
             <TextView
                     android:layout_width="wrap_content"
@@ -82,7 +81,8 @@
                     android:id="@+id/acceptBtn"
                     android:layout_below="@+id/switchActive"
                     android:layout_alignParentRight="true"
-                    android:layout_alignParentEnd="true" />
+                    android:layout_alignParentEnd="true"
+                android:onClick="onAccept" />
 
         </RelativeLayout>
 
