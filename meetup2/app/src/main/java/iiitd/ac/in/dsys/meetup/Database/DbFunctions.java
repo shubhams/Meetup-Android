@@ -4,10 +4,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-
-import java.util.ArrayList;
-
 import iiitd.ac.in.dsys.meetup.ObjectClasses.LocationObject;
+
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by vedantdasswain on 04/05/15.
@@ -40,14 +40,14 @@ public class DbFunctions {
 
     }
 
-    public static ArrayList<LocationObject> read(Context context,String meetupName){
-        ArrayList<LocationObject> locations=new ArrayList<LocationObject>();
+    public static List<LocationObject> read(Context context,String meetupName){
+        List<LocationObject> locations=new CopyOnWriteArrayList<>();
 
         DbHelper mDbHelper = new DbHelper(context);
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
         String query = "SELECT * FROM " + DatabaseContract.LocationEntry.TABLE_NAME+
-                " WHERE "+DatabaseContract.LocationEntry.MEETUPNAME+" = "+meetupName;
+                " WHERE "+DatabaseContract.LocationEntry.MEETUPNAME+" = '"+meetupName+"'";
 
         Cursor c = db.rawQuery(
                 query, null);
@@ -60,7 +60,7 @@ public class DbFunctions {
                 c.moveToNext();
             }
         }
-
+        db.close();
         return locations;
     }
 
