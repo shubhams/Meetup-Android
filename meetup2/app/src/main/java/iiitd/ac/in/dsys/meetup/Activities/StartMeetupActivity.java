@@ -10,16 +10,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CompoundButton;
-import android.widget.DatePicker;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.TimePicker;
-import android.widget.Toast;
-import android.widget.ViewFlipper;
-
+import android.widget.*;
 import com.appspot.intense_terra_821.data_api.DataApi;
 import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesUpMeetupCreateMessage;
 import com.appspot.intense_terra_821.users_api.UsersApi;
@@ -31,18 +22,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.*;
 import com.google.api.client.util.DateTime;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.TimeZone;
-
 import iiitd.ac.in.dsys.meetup.CommonUtils;
 import iiitd.ac.in.dsys.meetup.CustomUI.ContactsListAdapter;
 import iiitd.ac.in.dsys.meetup.ObjectClasses.ContactObject;
@@ -51,6 +32,11 @@ import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnContactsTaskCompleted;
 import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnMakeMeetupTaskCompleted;
 import iiitd.ac.in.dsys.meetup.messages.contactsTask;
 import iiitd.ac.in.dsys.meetup.messages.makeMeetupTask;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 public class StartMeetupActivity extends ActionBarActivity
         implements OnContactsTaskCompleted,android.widget.CompoundButton.OnCheckedChangeListener
@@ -185,6 +171,7 @@ public class StartMeetupActivity extends ActionBarActivity
         googleMap.setMyLocationEnabled(true);
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(myLatLng));
         googleMap.animateCamera(CameraUpdateFactory.zoomTo(18),2000,null);
+        meetUpLocation = googleMap.getCameraPosition().target;
         googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition cameraPosition) {
@@ -263,6 +250,7 @@ public class StartMeetupActivity extends ActionBarActivity
         createMessage.setInvited(invitees);
 
         createMessage.setTimeToArrive(timeToArrive);
+        Log.d(TAG, "line:266  " + meetUpLocation.latitude+" "+meetUpLocation.longitude);
         createMessage.setLat( meetUpLocation.latitude);
         createMessage.setLon( meetUpLocation.longitude);
 

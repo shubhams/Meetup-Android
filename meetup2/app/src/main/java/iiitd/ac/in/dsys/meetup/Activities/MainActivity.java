@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-
 import com.appspot.intense_terra_821.data_api.DataApi;
 import com.appspot.intense_terra_821.data_api.DataApiRequest;
 import com.appspot.intense_terra_821.data_api.DataApiRequestInitializer;
@@ -29,12 +28,6 @@ import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.json.gson.GsonFactory;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import iiitd.ac.in.dsys.meetup.CommonUtils;
 import iiitd.ac.in.dsys.meetup.R;
 import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnContactsTaskCompleted;
@@ -43,6 +36,11 @@ import iiitd.ac.in.dsys.meetup.messages.contactsTask;
 import iiitd.ac.in.dsys.meetup.messages.firstLoginTask;
 import iiitd.ac.in.dsys.meetup.messages.getAuthTokenTask;
 import iiitd.ac.in.dsys.meetup.messages.pingHelloTask;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class MainActivity extends ActionBarActivity implements OnContactsTaskCompleted, OnFirstLoginTaskCompleted{
@@ -96,7 +94,7 @@ public class MainActivity extends ActionBarActivity implements OnContactsTaskCom
         // add UI Callbacks
         setUICallbacks();
         // build services. Set the first param to true to test locally. Second param is local IP of server.
-        buildApiServices(true, "192.168.48.103");
+        buildApiServices(false, "192.168.1.3");
 
         // Check device for Play Services APK.
         if (checkPlayServices()) {

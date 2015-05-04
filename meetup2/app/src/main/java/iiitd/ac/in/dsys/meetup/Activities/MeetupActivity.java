@@ -1,5 +1,6 @@
 package iiitd.ac.in.dsys.meetup.Activities;
 
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -26,6 +27,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import iiitd.ac.in.dsys.meetup.CommonUtils;
 import iiitd.ac.in.dsys.meetup.ObjectClasses.MeetupObject;
 import iiitd.ac.in.dsys.meetup.R;
+import iiitd.ac.in.dsys.meetup.Services.HeartBeatService;
 import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnAcceptMeetupTaskCompleted;
 import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnGetMeetupDetailsTaskCompleted;
 import iiitd.ac.in.dsys.meetup.messages.acceptMeetupTask;
@@ -59,6 +61,14 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
     TextView meetupName, owner,timeToArrive;
     Switch switchActive;
     Button acceptBtn;
+    Intent serviceIntent;
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        stopService(serviceIntent);
+    }
+
     Button startButton;
 
     @Override
@@ -79,7 +89,8 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
             dataApiInst= CommonUtils.getDataApiInst();
             (new getMeetupDetailsTask(this, dataApiInst,mo, this)).execute();
         }
-
+        serviceIntent = new Intent(this, HeartBeatService.class);
+        startService(serviceIntent);
         setUI();
     }
 
