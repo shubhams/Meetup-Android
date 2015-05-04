@@ -200,7 +200,7 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
 
     private void setUpMyMap(LatLng latLng) {
         Log.d(TAG, "setUpMyMap called");
-        mMap.clear();
+//        mMap.clear();
 //        mMap.addMarker(new MarkerOptions().position(latLng).title("Here I am").snippet("Cool Bro!").draggable(true));
         mMap.setMyLocationEnabled(true);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -271,7 +271,6 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
         super.onResume();
         Log.d(TAG, "onResume called");
         mMap.clear();
-        mGAC.connect();
         locationObjectList = DbFunctions.read(MeetupActivity.this, mo.getName());
         for(LocationObject lo : locationObjectList)
         {
@@ -285,6 +284,8 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
         Log.v(TAG,"Plotted markers");
 
         renderPolylines();
+
+        mGAC.connect();
 //        createLocationRequest();
     }
 
