@@ -93,6 +93,11 @@
             android:name=".Services.DeactivateWakefulService"
             android:exported="false" >
         </service>
+
+        <service
+                android:name=".Services.HeartBeatService"
+                 android:enabled="true">
+        </service>
     </application>
 
 </manifest>

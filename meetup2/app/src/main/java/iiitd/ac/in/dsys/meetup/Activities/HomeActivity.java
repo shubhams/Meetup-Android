@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import iiitd.ac.in.dsys.meetup.DrawerSectionFragments.MeetupListFragment;
 import iiitd.ac.in.dsys.meetup.Fragments.NavigationDrawerFragment;
 import iiitd.ac.in.dsys.meetup.R;
+import iiitd.ac.in.dsys.meetup.Services.HeartBeatService;
 
 
 public class HomeActivity extends ActionBarActivity
@@ -29,6 +30,7 @@ public class HomeActivity extends ActionBarActivity
      */
     private CharSequence mTitle;
     private static final String TAG="HomeActivity";
+    private Intent serviceIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +45,7 @@ public class HomeActivity extends ActionBarActivity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+        serviceIntent = new Intent(this, HeartBeatService.class);
     }
 
     @Override
@@ -62,6 +65,18 @@ public class HomeActivity extends ActionBarActivity
                     .replace(R.id.container, fragment)
                             .commit();
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        startService(serviceIntent);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        stopService(serviceIntent);
     }
 
     public void onSectionAttached(int number) {

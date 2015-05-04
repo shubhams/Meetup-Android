@@ -2,18 +2,23 @@ package iiitd.ac.in.dsys.meetup.LocationListener;
 
 import android.content.Context;
 import android.location.Location;
-import android.location.LocationListener;
-import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
+import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesMeetupLocationsUpdateFullMessage;
+import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesUpLocationMessage;
+import com.google.android.gms.location.LocationListener;
+import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnHeartBeatCompleted;
 
 /**
  * Created by Shubham on 02 May 15.
  */
-public class MyLocationListener implements LocationListener
+public class MyLocationListener implements LocationListener, OnHeartBeatCompleted
 {
 
-    Location currentLocation;
-    Context context;
+    private Location currentLocation;
+    private Context context;
     private static String TAG;
+    private ApiCustomMessagesUpLocationMessage upLocationMessage;
 
     public MyLocationListener(Context cnt)
     {
@@ -23,23 +28,19 @@ public class MyLocationListener implements LocationListener
 
     @Override
     public void onLocationChanged(Location location) {
-        currentLocation = location;
-//        Toast.makeText(getApplicationContext(), String.valueOf(currentLocation.getLatitude() + " " + currentLocation.getLongitude()), Toast.LENGTH_LONG).show();
-//        sendHeartBeat(location);
+        if(location!=null)
+        {
+            currentLocation = location;
+            Toast.makeText(context, String.valueOf(currentLocation.getLatitude() + " " + currentLocation.getLongitude()), Toast.LENGTH_LONG).show();
+//            sendHeartBeat(currentLocation);
+//
+        }
+        else
+            Log.d(TAG, "location object found as null");
     }
 
     @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
+    public void onHeatBeatReceived(ApiCustomMessagesMeetupLocationsUpdateFullMessage fullMessage) {
 
     }
 }

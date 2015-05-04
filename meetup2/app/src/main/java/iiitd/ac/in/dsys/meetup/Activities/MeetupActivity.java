@@ -1,6 +1,5 @@
 package iiitd.ac.in.dsys.meetup.Activities;
 
-import android.content.Intent;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
@@ -18,49 +17,32 @@ import android.widget.Button;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.appspot.intense_terra_821.data_api.DataApi;
-import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesLocationMessage;
-import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesMeetupDescMessage;
-import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesMeetupLocationsUpdateFullMessage;
-import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesPeepLocationsMessage;
-import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesSuccessMessage;
-import com.appspot.intense_terra_821.data_api.model.ApiCustomMessagesUpLocationMessage;
+import com.appspot.intense_terra_821.data_api.model.*;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import iiitd.ac.in.dsys.meetup.CommonUtils;
+import iiitd.ac.in.dsys.meetup.ObjectClasses.MeetupAlarmIntent;
+import iiitd.ac.in.dsys.meetup.ObjectClasses.MeetupObject;
+import iiitd.ac.in.dsys.meetup.R;
+import iiitd.ac.in.dsys.meetup.Receivers.DeactivateAlarmReceiver;
+import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.*;
+import iiitd.ac.in.dsys.meetup.messages.*;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.TimeZone;
 
-import iiitd.ac.in.dsys.meetup.CommonUtils;
-import iiitd.ac.in.dsys.meetup.ObjectClasses.MeetupAlarmIntent;
-import iiitd.ac.in.dsys.meetup.ObjectClasses.MeetupObject;
-import iiitd.ac.in.dsys.meetup.R;
-import iiitd.ac.in.dsys.meetup.Services.HeartBeatService;
-import iiitd.ac.in.dsys.meetup.Receivers.DeactivateAlarmReceiver;
-import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnAcceptMeetupTaskCompleted;
-import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnActivateMeetupTaskCompleted;
-import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnDeactivateMeetupTaskCompleted;
-import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnGetMeetupDetailsTaskCompleted;
-import iiitd.ac.in.dsys.meetup.TaskCompleteInterfaces.OnHeartBeatCompleted;
-import iiitd.ac.in.dsys.meetup.messages.acceptMeetupTask;
-import iiitd.ac.in.dsys.meetup.messages.activateMeetupTask;
-import iiitd.ac.in.dsys.meetup.messages.deactivateMeetupTask;
-import iiitd.ac.in.dsys.meetup.messages.getMeetupDetailsTask;
-import iiitd.ac.in.dsys.meetup.messages.sendHeartBeatTask;
-
-public class MeetupActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, LocationListener, OnGetMeetupDetailsTaskCompleted,
-        OnHeartBeatCompleted, OnAcceptMeetupTaskCompleted, OnActivateMeetupTaskCompleted, OnDeactivateMeetupTaskCompleted {
+public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetailsTaskCompleted,
+        OnHeartBeatCompleted, OnAcceptMeetupTaskCompleted, OnActivateMeetupTaskCompleted,
+        OnDeactivateMeetupTaskCompleted, GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = "MeetupActivity";
     private DataApi dataApiInst;
@@ -70,7 +52,7 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
     LatLng mLoc;
     Location currentLocation;
     Location mLastLocation;
-    LocationRequest lr1;
+//    LocationRequest lr1;
     public static GoogleMap mMap;
 
     static final LatLng NewDelhi = new LatLng(28.6139, 77.2089);
@@ -80,16 +62,7 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
     TextView meetupName, owner, timeToArrive;
     Switch switchActive;
     Button acceptBtn;
-    Intent serviceIntent;
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        stopService(serviceIntent);
-    }
-
     Button startButton;
-
     AlarmManager alarmMgr;
     PendingIntent alarmIntent;
 
@@ -112,8 +85,8 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
             dataApiInst = CommonUtils.getDataApiInst();
             (new getMeetupDetailsTask(this, dataApiInst, mo, this)).execute();
         }
-        serviceIntent = new Intent(this, HeartBeatService.class);
-        startService(serviceIntent);
+//        serviceIntent = new Intent(this, HeartBeatService.class);
+//        startService(serviceIntent);
         setUI();
     }
 
@@ -235,24 +208,24 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
         }
     }
 
-    private void createLocationRequest() {
-        lr1 = new LocationRequest();
-        lr1.setInterval(20000);
-        lr1.setFastestInterval(10000);
-        lr1.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-    }
+//    private void createLocationRequest() {
+//        lr1 = new LocationRequest();
+//        lr1.setInterval(30000);
+//        lr1.setFastestInterval(30000);
+//        lr1.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+//    }
 
     @Override
     protected void onPause() {
         super.onPause();
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGAC, this);
+//        LocationServices.FusedLocationApi.removeLocationUpdates(mGAC, this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         mGAC.connect();
-        createLocationRequest();
+//        createLocationRequest();
     }
 
     @Override
@@ -265,7 +238,7 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
             setUpMyMap(mLoc);
         } else
             setUpMyMap(NewDelhi);
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGAC, lr1, this);
+//        LocationServices.FusedLocationApi.requestLocationUpdates(mGAC, lr1, this);
     }
 
     @Override
@@ -273,12 +246,18 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
         Log.d("DEBUG", "onConnectedSuspended reached");
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
-        currentLocation = location;
-        Toast.makeText(getApplicationContext(), String.valueOf(currentLocation.getLatitude() + " " + currentLocation.getLongitude()), Toast.LENGTH_LONG).show();
-        sendHeartBeat(location);
-    }
+//    @Override
+//    public void onLocationChanged(Location location) {
+//        if(location!=null)
+//        {
+//            currentLocation = location;
+//            Toast.makeText(getApplicationContext(), String.valueOf(currentLocation.getLatitude() + " " + currentLocation.getLongitude()), Toast.LENGTH_LONG).show();
+//            sendHeartBeat(currentLocation);
+//
+//        }
+//        else
+//            Log.d(TAG,"location object found as null");
+//    }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
@@ -288,7 +267,7 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
     @Override
     public void onHeatBeatReceived(ApiCustomMessagesMeetupLocationsUpdateFullMessage fullMessage) {
         List<ApiCustomMessagesPeepLocationsMessage> userMeetupLocations = fullMessage.getUserMeetupLocations();
-        if (userMeetupLocations != null)
+        if (userMeetupLocations != null) {
             for (int i = 0; i < userMeetupLocations.size(); ++i) {
                 Log.d(TAG, userMeetupLocations.get(i).toString());
                 mMap.clear();
@@ -300,8 +279,8 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
                 //Comment the line below to see your location also, as a marker on the map
                 if (!peepLocationsMessage.getEmail().equals(mo.getOwner()))
                     mMap.addMarker(new MarkerOptions().position(latLng).title(userName).snippet(userEmail));
-
             }
+        }
     }
 
     @Override
@@ -340,7 +319,6 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
 
             Toast.makeText(this,"Activated",Toast.LENGTH_SHORT).show();
             mo.setActive(true);
-
         }
     }
 
@@ -363,7 +341,7 @@ public class MeetupActivity extends FragmentActivity implements GoogleApiClient.
 
             // 2. Chain together various setter methods to set the dialog characteristics
             builder.setMessage(meetupSuccess.getStrValue())
-                    .setTitle("Dayyuuum!");
+                    .setTitle("Dayyuuumn!");
 
             // 3. Get the AlertDialog from create()
             AlertDialog dialog = builder.create();
