@@ -105,7 +105,7 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
         userEmail = settings.getString("ACCOUNT_NAME", "");
         bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.peep_marker);
         markerIcon = bitmapDrawable.getBitmap();
-        markerIcon = Bitmap.createScaledBitmap(markerIcon,50,50,false);
+        markerIcon = Bitmap.createScaledBitmap(markerIcon,25,25,false);
         setUI();
     }
 
@@ -250,7 +250,10 @@ public class MeetupActivity extends FragmentActivity implements OnGetMeetupDetai
         super.onResume();
         Log.d(TAG, "onResume called");
         mMap.clear();
-        Log.d(TAG,"locationObject coordinates:"+mo.getLat()+","+mo.getLon());
+        if(meetupLatLng!=null) {
+            mMap.addMarker(new MarkerOptions().position(meetupLatLng).
+                    title("Meetup Destination"));
+        }
         locationObjectList = DbFunctions.read(MeetupActivity.this, mo.getName());
         for(LocationObject lo : locationObjectList)
         {
