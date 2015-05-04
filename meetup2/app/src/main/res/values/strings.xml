@@ -17,6 +17,7 @@
     <string name="button_start_map">Start</string>
 
     <string name="action_new_meetup">New Meetup</string>
+    <string name="action_refresh_contacts">Refresh Contacts</string>
     <string name="action_done">Done</string>
     <string name="action_next">Next</string>
     <string name="action_previous">Previous</string>

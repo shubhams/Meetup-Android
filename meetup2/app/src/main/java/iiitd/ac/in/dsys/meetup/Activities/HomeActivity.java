@@ -11,10 +11,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import iiitd.ac.in.dsys.meetup.CommonUtils;
 import iiitd.ac.in.dsys.meetup.DrawerSectionFragments.MeetupListFragment;
 import iiitd.ac.in.dsys.meetup.Fragments.NavigationDrawerFragment;
 import iiitd.ac.in.dsys.meetup.R;
 import iiitd.ac.in.dsys.meetup.Services.HeartBeatService;
+import iiitd.ac.in.dsys.meetup.messages.refreshContactsTask;
 
 
 public class HomeActivity extends ActionBarActivity
@@ -122,6 +124,10 @@ public class HomeActivity extends ActionBarActivity
         if (id == R.id.action_new_meetup){
             Intent i = new Intent(HomeActivity.this, StartMeetupActivity.class);
             startActivity(i);
+            return true;
+        }
+        if (id == R.id.action_refresh_contacts){
+            (new refreshContactsTask(this, CommonUtils.getUsersApiInst())).execute();
             return true;
         }
 

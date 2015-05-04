@@ -13,6 +13,7 @@ import android.util.Log;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import iiitd.ac.in.dsys.meetup.Activities.MainActivity;
+import iiitd.ac.in.dsys.meetup.Activities.MeetupActivity;
 import iiitd.ac.in.dsys.meetup.R;
 
 
@@ -27,6 +28,7 @@ public class GcmIntentService extends IntentService {
     private static final String TAG = "GcmIntentService";
     private NotificationManager mNotificationManager;
     NotificationCompat.Builder builder;
+    Bundle notificationExtras;
 
     // TODO: Rename actions, choose action names that describe tasks that this
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
@@ -70,19 +72,27 @@ public class GcmIntentService extends IntentService {
              */
                 if (GoogleCloudMessaging.
                         MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
-                    sendNotification("Send error: " + extras.toString());
+                    sendNotification("Send error: " + extras.toString(),"");
                 } else if (GoogleCloudMessaging.
                         MESSAGE_TYPE_DELETED.equals(messageType)) {
                     sendNotification("Deleted messages on server: " +
-                            extras.toString());
+                            extras.toString(),"");
                     // If it's a regular GCM message, do some work.
                 } else if (GoogleCloudMessaging.
                         MESSAGE_TYPE_MESSAGE.equals(messageType)) {
 
+                    notificationExtras=extras;
+
                     Log.i(TAG, "Completed work @ " + SystemClock.elapsedRealtime());
                     // Post notification of received message.
-                    sendNotification("Received: " + extras.toString());
-                    Log.i(TAG, "Received: " + extras.toString());
+                    if(extras.getString("collapse_key").equals("make_meetup")) {
+                        sendNotification("Received: " + extras.toString(),"make_meetup");
+                    }
+                    else{
+                        sendNotification("Received: " + extras.toString(),"");
+                    }
+
+                    Log.i(TAG, "Received: " + extras.toString()+" "+" ck="+extras.getString("collapse_key"));
                 }
             }
             // Release the wake lock provided by the WakefulBroadcastReceiver.
@@ -93,17 +103,32 @@ public class GcmIntentService extends IntentService {
     // Put the message into a notification and post it.
     // This is just one simple example of what you might choose to do with
     // a GCM message.
-    private void sendNotification(String msg) {
+    private void sendNotification(String msg, String key) {
         mNotificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, MainActivity.class), 0);
+        PendingIntent contentIntent;
+
+        if(key.equals("make_meetup")){
+            Intent i = new Intent(this,MeetupActivity.class);
+            i.putExtra("name",notificationExtras.getString("meetup_name"));
+            i.putExtra("owner",notificationExtras.getString("meetup_owner_email"));
+            i.putExtra("active",Boolean.getBoolean(notificationExtras.getString("active")));
+            i.putExtra("accepted",false);
+
+            contentIntent = PendingIntent.getActivity(this, 2204,i, PendingIntent.FLAG_UPDATE_CURRENT);
+            msg=notificationExtras.getString("meetup_owner_email")+" invited you to join "
+                    +notificationExtras.getString("meetup_name");
+        }
+        else {
+            contentIntent = PendingIntent.getActivity(this, 0,
+                    new Intent(this, MainActivity.class), 0);
+        }
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.ic_launcher)
-                        .setContentTitle("GCM Notification")
+                        .setContentTitle("Meetup")
                         .setStyle(new NotificationCompat.BigTextStyle()
                                 .bigText(msg))
                         .setContentText(msg);
